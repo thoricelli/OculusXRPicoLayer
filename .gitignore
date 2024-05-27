@@ -1,0 +1,7 @@
+# Personal documentation & testing env.
+apk_testing
+ghidra
+build_apk.ps1
+
+# Build results
+out
