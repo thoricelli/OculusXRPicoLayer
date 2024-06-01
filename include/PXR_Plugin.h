@@ -1,4 +1,5 @@
 ﻿//For both libpxr_api & libPxrPlatform.
+#include <stdint.h>
 
 typedef struct PICO_UserDefinedSettings
 {
@@ -73,6 +74,6 @@ extern bool Pxr_GetBoundaryConfigured();
 extern int Pxr_GetBoundaryDimensions(bool isPlayArea, PxrVector3f *dimension);
 extern bool Pxr_GetBoundaryVisible();
 extern int Pxr_SetBoundaryVisible(bool value);
-extern bool Pxr_GetDisplayRefreshRatesAvailable(int *configCount, int *configArray);
+extern bool Pxr_GetDisplayRefreshRatesAvailable(intptr_t *configCount, int32_t *configArray);
 extern int Pxr_SetDisplayRefreshRate(float refreshRate);
 extern int Pxr_GetConfigFloat(enum ConfigType configIndex, float* value);

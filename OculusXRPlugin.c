@@ -10,7 +10,7 @@
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 
-extern void SetColorScale(float x, float y, float z, float w) {
+void SetColorScale(float x, float y, float z, float w) {
     s_ColorScale.x = x;
     s_ColorScale.y = y;
     s_ColorScale.z = z;
@@ -19,27 +19,27 @@ extern void SetColorScale(float x, float y, float z, float w) {
 
 ovrpVector4f s_ColorOffset = {1.0f, 1.0f, 1.0f, 1.0f};
 
-extern void SetColorOffset(float x, float y, float z, float w) {
+void SetColorOffset(float x, float y, float z, float w) {
     s_ColorOffset.x = x;
     s_ColorOffset.y = y;
     s_ColorOffset.z = z;
     s_ColorOffset.w = w;
 }
 
-extern bool GetIsSupportedDevice() {
+bool GetIsSupportedDevice() {
     return true;
 }
 
-extern bool LoadOVRPlugin(char *ovrpPath) {
+bool LoadOVRPlugin(char *ovrpPath) {
     return Pxr_LoadPlugin();
 }
 
-extern void UnloadOVRPlugin() {
+void UnloadOVRPlugin() {
     return Pxr_UnloadPlugin();
 }
 
 //God, theres different versions of UserDefinedSettings... :(
-extern void SetUserDefinedSettings(UserDefinedSettings *settings) {
+void SetUserDefinedSettings(UserDefinedSettings *settings) {
     __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "Hello World! Made by thoricelli.");
 
     PICO_UserDefinedSettings picoUserDefinedSettings =
@@ -60,133 +60,133 @@ extern void SetUserDefinedSettings(UserDefinedSettings *settings) {
 }
 
 //This would have been handy PICO...
-extern int SetCPULevel(int cpuLevel) {
+int SetCPULevel(int cpuLevel) {
     return cpuLevel;
 }
 
-extern int SetGPULevel(int gpuLevel) {
+int SetGPULevel(int gpuLevel) {
     return gpuLevel;
 }
 
-extern void GetOVRPVersion(char* version) {
+void GetOVRPVersion(char* version) {
     return;
 }
 
-extern void EnablePerfMetrics(bool enable) {
+void EnablePerfMetrics(bool enable) {
     return;
 }
 
-extern void EnableAppMetrics(bool enable) {
+void EnableAppMetrics(bool enable) {
     return;
 }
 
-extern bool SetDeveloperModeStrict(bool active) {
+bool SetDeveloperModeStrict(bool active) {
     return true;
 }
 
-extern bool GetAppHasInputFocus() {
+bool GetAppHasInputFocus() {
     return true;
 }
 
-extern bool GetBoundaryConfigured() {
+bool GetBoundaryConfigured() {
     return Pxr_GetBoundaryConfigured();
 }
 
-//extern bool GetBoundaryDimensions(Boundary.BoundaryType boundaryType, Vector3 dimensions) {
+//bool GetBoundaryDimensions(Boundary.BoundaryType boundaryType, Vector3 dimensions) {
 
-extern bool GetBoundaryDimensions(void* boundaryType, void* dimensions) {
+bool GetBoundaryDimensions(void* boundaryType, void* dimensions) {
     return Pxr_GetBoundaryDimensions(true, dimensions);
 }
 
-extern bool GetBoundaryVisible() {
+bool GetBoundaryVisible() {
     return Pxr_GetBoundaryVisible();
 }
 
-extern void SetBoundaryVisible(bool boundaryVisible) {
+void SetBoundaryVisible(bool boundaryVisible) {
     Pxr_SetBoundaryVisible(boundaryVisible);
 }
 
-extern bool GetAppShouldQuit() {
+bool GetAppShouldQuit() {
     return false;
 }
 
-extern bool GetDisplayAvailableFrequencies(int *ptr, int *numFrequencies) {
+bool GetDisplayAvailableFrequencies(intptr_t *ptr, int32_t *numFrequencies) {
     return Pxr_GetDisplayRefreshRatesAvailable(ptr, numFrequencies);
 }
 
-extern bool SetDisplayFrequency(float refreshRate) {
+bool SetDisplayFrequency(float refreshRate) {
     return Pxr_SetDisplayRefreshRate(refreshRate);
 }
 
-extern bool GetDisplayFrequency(float refreshRate) {
+bool GetDisplayFrequency(float refreshRate) {
     return Pxr_GetConfigFloat(SystemDisplayRate, &refreshRate);
 }
 
-extern enum SystemHeadset GetSystemHeadsetType() {
+enum SystemHeadset GetSystemHeadsetType() {
     //I mean, something like that, right?
     return Meta_Quest_3;
 }
 
-extern bool GetTiledMultiResSupported() {
+bool GetTiledMultiResSupported() {
     return true;
 }
 
-extern void SetTiledMultiResLevel(int level) {
+void SetTiledMultiResLevel(int level) {
     return;
 }
 
-extern int GetTiledMultiResLevel() {
+int GetTiledMultiResLevel() {
     return 1;
 }
 
-extern void SetTiledMultiResDynamic(bool isDynamic) {
+void SetTiledMultiResDynamic(bool isDynamic) {
     return;
 }
 
-extern bool GetEyeTrackedFoveatedRenderingSupported() {
+bool GetEyeTrackedFoveatedRenderingSupported() {
     return true;
 }
 
-extern bool GetEyeTrackedFoveatedRenderingEnabled() {
+bool GetEyeTrackedFoveatedRenderingEnabled() {
     return true;
 }
 
-extern void SetEyeTrackedFoveatedRenderingEnabled(bool isEnabled) {
+void SetEyeTrackedFoveatedRenderingEnabled(bool isEnabled) {
     return;
 }
 
-extern bool GetShouldRestartSession() {
+bool GetShouldRestartSession() {
     return false;
 }
 
-extern bool SetupEnvironmentDepth(EnvironmentDepthCreateParamsInternal* createParams) {
+bool SetupEnvironmentDepth(EnvironmentDepthCreateParamsInternal* createParams) {
     return true;
 }
 
-extern bool SetEnvironmentDepthRendering(bool isEnabled) {
+bool SetEnvironmentDepthRendering(bool isEnabled) {
     return true;
 }
 
-extern bool ShutdownEnvironmentDepth() {
+bool ShutdownEnvironmentDepth() {
     return true;
 }
 
-extern bool GetEnvironmentDepthTextureId(uint id) {
+bool GetEnvironmentDepthTextureId(uint id) {
     return true;
 }
 
-extern bool GetEnvironmentDepthFrameDesc(EnvironmentDepthFrameDescInternal* frameDesc, int eye) {
+bool GetEnvironmentDepthFrameDesc(EnvironmentDepthFrameDescInternal* frameDesc, int eye) {
     return true;
 }
 
-extern bool SetEnvironmentDepthHandRemoval(bool isEnabled) {
+bool SetEnvironmentDepthHandRemoval(bool isEnabled) {
     return true;
 }
 
-extern bool GetEnvironmentDepthSupported() {
+bool GetEnvironmentDepthSupported() {
     return false;
 }
 
-extern bool GetEnvironmentDepthHandRemovalSupported() {
+bool GetEnvironmentDepthHandRemovalSupported() {
     return true;
 }

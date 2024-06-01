@@ -2,6 +2,7 @@
 apk_testing
 ghidra
 build_apk.ps1
+.idea
 
 # Build results
 out
