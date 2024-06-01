@@ -6,7 +6,8 @@
 #include <android/log.h>
 
 #include "OculusXRPlugin.h"
-#include "include/PXR_Plugin.h"
+#include "/include/PxrPlatform.h"
+#include "/include/Globals.h"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -40,7 +41,7 @@ void UnloadOVRPlugin() {
 
 //God, theres different versions of UserDefinedSettings... :(
 void SetUserDefinedSettings(UserDefinedSettings *settings) {
-    __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "Hello World! Made by thoricelli.");
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "Hello World! Made by thoricelli.");
 
     PICO_UserDefinedSettings picoUserDefinedSettings =
     {

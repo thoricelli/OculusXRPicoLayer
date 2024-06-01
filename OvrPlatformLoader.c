@@ -6,7 +6,8 @@
 #include <android/log.h>
 
 #include "OvrPlatformLoader.h"
-#include "/include/PXR_platformloader.h"
+#include "/include/PxrPlatformLoader.h"
+#include "/include/Globals.h"
 
 //My soul...
 
@@ -26,19 +27,19 @@ unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
     return 0x1AD307B4; //Platform_InitializeAndroidAsynchronous, not sure if I can just return what ppf_UnityInitAsynchronousWrapper outputs.
 }
 bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
-    __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "%s called! But not implemented!", __func__);
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return true;
 }
 unsigned long ovr_Platform_InitializeStandaloneOculus(OculusInitParams* init) {
-    __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "%s called! But not implemented!", __func__);
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessToken(uint64_t appId, char *accessToken) {
-    __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "%s called! But not implemented!", __func__);
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessTokenAndOptions(uint64_t appId, char *accessToken, ovrKeyValuePair configOptions[], uintptr_t numOptions) {
-    __android_log_print(ANDROID_LOG_INFO, "OculusXRPicoLayer", "%s called! But not implemented!", __func__);
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0x1AD307B4;
 }
 
@@ -115,6 +116,7 @@ void ovr_Voip_SetMicrophoneFilterCallbackWithFixedSizeBuffer(FilterCallback cb, 
 // Logging
 
 void ovr_Log_NewEvent(intptr_t eventName, intptr_t *values, uintptr_t length) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "OVR Log: event: %ld, ", eventName);
     return;
 }
 intptr_t ovr_ApplicationLifecycle_GetLaunchDetails() {

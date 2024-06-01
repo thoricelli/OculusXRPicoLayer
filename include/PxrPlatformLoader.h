@@ -1,5 +1,4 @@
-﻿//For both libpxr_api & libPxrPlatform.
-#include <stdint.h>
+﻿#include <stdint.h>
 
 typedef enum {
     ppfPlatformInitializeResult_Unknown = -999,

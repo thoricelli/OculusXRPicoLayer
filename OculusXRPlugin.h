@@ -32,7 +32,7 @@ typedef struct _UserDefinedSettings {
 
 enum SystemHeadset
 {
-    None = 0,
+    SystemHeadset_None = 0,
 
     // Standalone headsets
     Oculus_Quest = 8,
@@ -72,7 +72,6 @@ typedef struct Vector3
     float x, y, z;
 } Vector3;
 
-//When's vector5?
 typedef struct Vector4
 {
     float w, x, y, z;
