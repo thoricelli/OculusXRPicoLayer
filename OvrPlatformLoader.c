@@ -14,6 +14,7 @@
 // Initialization
 
 bool ovr_UnityInitWrapper(char *appId) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s was called!", __func__);
     return ppf_UnityInitWrapper(appId) == ppfPlatformInitializeResult_Success;
 }
 
@@ -23,6 +24,7 @@ void ovr_UnityInitGlobals(intptr_t loggingCB) {
     return;
 }
 unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s was called!", __func__);
     ppf_UnityInitAsynchronousWrapper(appId);
     return 0x1AD307B4; //Platform_InitializeAndroidAsynchronous, not sure if I can just return what ppf_UnityInitAsynchronousWrapper outputs.
 }
