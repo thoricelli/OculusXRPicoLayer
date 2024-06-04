@@ -6,6 +6,7 @@
 #include <android/log.h>
 
 #include "OvrPlatformLoader.h"
+#include "/include/PxrPlugin.h"
 #include "/include/PxrPlatformLoader.h"
 #include "/include/Globals.h"
 
@@ -21,6 +22,7 @@ bool ovr_UnityInitWrapper(char *appId) {
 // Initializes just the global variables to use the Unity api without calling the init logic
 
 void ovr_UnityInitGlobals(intptr_t loggingCB) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
     return;
 }
 unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
@@ -30,18 +32,21 @@ unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
 }
 bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
-    return true;
+    return ppf_UnityInitWrapper("0") == ppfPlatformInitializeResult_Success;
 }
 unsigned long ovr_Platform_InitializeStandaloneOculus(OculusInitParams* init) {
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    ppf_UnityInitWrapper("0");
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessToken(uint64_t appId, char *accessToken) {
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    ppf_UnityInitWrapper("0");
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessTokenAndOptions(uint64_t appId, char *accessToken, ovrKeyValuePair configOptions[], uintptr_t numOptions) {
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    ppf_UnityInitWrapper((char *)&appId);
     return 0x1AD307B4;
 }
 
@@ -106,7 +111,7 @@ unsigned long ovr_HTTP_GetWithMessageType(char *url, int messageType) {
     return 0;
 }
 void ovr_CrashApplication() {
-    return;
+    Pxr_Shutdown();
 }
 void ovr_Voip_SetMicrophoneFilterCallback(FilterCallback cb) {
     return;

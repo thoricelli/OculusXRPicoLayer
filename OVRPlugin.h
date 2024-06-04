@@ -1116,4 +1116,10 @@ typedef struct SceneCaptureRequestInternal_
     char *request;
 } SceneCaptureRequestInternal;
 
+//Nowhere to be found?
+/*typedef struct RenderAPIType_
+{
+
+} RenderAPIType;*/
+
 #endif

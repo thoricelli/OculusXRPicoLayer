@@ -7,6 +7,7 @@
 
 #include "OculusXRPlugin.h"
 #include "/include/PxrPlatform.h"
+#include "/include/PxrPlugin.h"
 #include "/include/Globals.h"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -32,11 +33,29 @@ bool GetIsSupportedDevice() {
 }
 
 bool LoadOVRPlugin(char *ovrpPath) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
     return Pxr_LoadPlugin();
 }
 
 void UnloadOVRPlugin() {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
     return Pxr_UnloadPlugin();
+}
+
+Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
+    float f1 = sqrtf(from.x * from.x + from.y * from.y + from.z * from.z);
+    float f2 = sqrtf(to.x * to.x + to.y * to.y + to.z * to.z);
+    if (f1 < 1e-6f || f2 < 1e-6f) {
+        return (Quaternion){1.0f, 0.0f, 0.0f, 0.0f};
+    }
+    Vector3 nfrom = {from.x / f1, from.y / f1, from.z / f1};
+    Vector3 nto = {to.x / f2, to.y / f2, to.z / f2};
+    Vector3 axis = {nfrom.y * nto.z - nfrom.z * nto.y,
+                    nfrom.z * nto.x - nfrom.x * nto.z,
+                    nfrom.x * nto.y - nfrom.y * nto.x};
+    float htheta = acosf(fminf(1.0f, nfrom.x * nto.x + nfrom.y * nto.y + nfrom.z * nto.z));
+    Quaternion quat = {cosf(htheta), axis.x * sinf(htheta), axis.y * sinf(htheta), axis.z * sinf(htheta)};
+    return quat;
 }
 
 //God, theres different versions of UserDefinedSettings... :(
@@ -56,6 +75,7 @@ void SetUserDefinedSettings(UserDefinedSettings *settings) {
         .enableStageMode = 0,
     };
 
+    Pxr_Construct(&ConvertRotationWith2Vector);
     Pxr_SetUserDefinedSettings(picoUserDefinedSettings);
     return;
 }
@@ -70,6 +90,7 @@ int SetGPULevel(int gpuLevel) {
 }
 
 void GetOVRPVersion(char* version) {
+    version = OVRP_VERSION;
     return;
 }
 
@@ -111,8 +132,8 @@ bool GetAppShouldQuit() {
     return false;
 }
 
-bool GetDisplayAvailableFrequencies(intptr_t *ptr, int32_t *numFrequencies) {
-    return Pxr_GetDisplayRefreshRatesAvailable(ptr, numFrequencies);
+bool GetDisplayAvailableFrequencies(uint32_t *ptr, float *numFrequencies) {
+    return Pxr_GetDisplayRefreshRatesAvailable(ptr, &numFrequencies);
 }
 
 bool SetDisplayFrequency(float refreshRate) {
@@ -120,7 +141,7 @@ bool SetDisplayFrequency(float refreshRate) {
 }
 
 bool GetDisplayFrequency(float refreshRate) {
-    return Pxr_GetConfigFloat(SystemDisplayRate, &refreshRate);
+    return Pxr_GetConfigFloat(PXR_GET_DISPLAY_RATE, &refreshRate);
 }
 
 enum SystemHeadset GetSystemHeadsetType() {

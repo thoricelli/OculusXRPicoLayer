@@ -55,6 +55,13 @@ typedef struct PxrQuaternionf_ {
     float    w;
 } PxrQuaternionf;
 
+typedef struct Quaternion_ {
+    float    W;
+    float    X;
+    float    Y;
+    float    Z;
+} Quaternion;
+
 typedef struct PxrVector2f_ {
     float    x;
     float    y;

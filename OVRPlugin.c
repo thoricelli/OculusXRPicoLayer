@@ -8,8 +8,55 @@
 #include "OVRPlugin.h"
 #include "OculusXRPlugin.h"
 #include "/include/PxrPlugin.h"
+#include "/include/PxrInput.h"
 #include "/include/Globals.h"
+#include "/include/PxrPlatform.h"
+#include "/src/PxrUnityPluginLoader.c"
 
+/* LEGACY (TODO) */
+bool ovrp_PreInitialize() {
+    return 0;
+}
+bool ovrp_Initialize(/*RenderAPIType*/int apiType, intptr_t platformArgs) {
+    return 0;
+}
+bool ovrp_Shutdown() {
+    return 0;
+}
+bool ovrp_SetupDistortionWindow() {
+    return 0;
+}
+bool ovrp_DestroyDistortionWindow() {
+    return 0;
+}
+bool ovrp_RecreateEyeTexture(Eye eyeId, int stage, void* device, int height, int width, int samples, bool isSRGB, void* result) {
+    return 0;
+}
+bool ovrp_SetEyeTexture(Eye eyeId, intptr_t texture) {
+    return 0;
+}
+bool ovrp_Update(int frameIndex) {
+    return 0;
+}
+bool ovrp_BeginFrame(int frameIndex) {
+    return Pxr_BeginFrame();
+}
+bool ovrp_EndEye(Eye eye) {
+    return 0;
+}
+bool ovrp_EndFrame(int frameIndex) {
+    return Pxr_EndFrame();
+}
+bool ovrp_RecenterPose() {
+    return 0;
+}
+/* END */
+
+//NON-LEGACY
+void UnityPluginLoad(void *unityInterfaces) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
+    Pxr_UnityPluginLoad(unityInterfaces);
+}
 Sizei ovrp_GetEyeTextureSize(Eye eyeId) {
     Sizei sizeiDummy;
     return sizeiDummy;
@@ -33,10 +80,12 @@ Posef ovrp_GetNodeAcceleration(Node nodeId) {
     return posefDummy;
 }
 TrackingOrigin ovrp_GetTrackingOriginType() {
-    return 0;
+    PxrTrackingOrigin pxrTrackingOriginDummy;
+    //Doesn't actually use the argument?
+    return (TrackingOrigin)Pxr_GetTrackingOrigin(&pxrTrackingOriginDummy);
 }
 bool ovrp_SetTrackingOriginType(TrackingOrigin originType) {
-    return 0;
+    return Pxr_SetTrackingOrigin((PxrTrackingOrigin) originType);
 }
 Posef ovrp_GetTrackingCalibratedOrigin() {
     Posef posefDummy;
@@ -46,6 +95,7 @@ bool ovrp_RecenterTrackingOrigin(uint flags) {
     return 0;
 }
 bool ovrp_GetInitialized() {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
     return Pxr_IsInitialized();
 }
 intptr_t ovrp_GetVersion() {
@@ -166,9 +216,10 @@ bool ovrp_GetUserPresent() {
     return 0;
 }
 float ovrp_GetUserIPD() {
-    return 0;
+    return Pxr_GetIPD();
 }
 bool ovrp_SetUserIPD(float value) {
+    //Maybe later, need to test if this doesn't set it to dangerous levels.
     return 0;
 }
 float ovrp_GetUserEyeDepth() {
@@ -202,10 +253,12 @@ SystemRegion ovrp_GetSystemRegion() {
     return 0;
 }
 bool ovrp_GetTrackingIPDEnabled() {
-    return 0;
+    return false;
+    //return Pvr_GetTrackingIPDEnabled();
 }
 bool ovrp_SetTrackingIPDEnabled(bool value) {
-    return 0;
+    return false;
+    //return Pvr_SetTrackingIPDEnabled(value);
 }
 HapticsDesc ovrp_GetControllerHapticsDesc(uint controllerMask) {
     HapticsDesc hapticsDescDummy;

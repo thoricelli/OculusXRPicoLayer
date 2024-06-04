@@ -97,6 +97,11 @@ int Pxr_GetTrackingOrigin(PxrTrackingOrigin* trackingOrigin);
 
 // IPD
 float Pxr_GetIPD();
+bool Pvr_SetIPD(float distance);
+float Pvr_GetIPD();
+bool Pvr_SetTrackingIPDEnabled(bool enable);
+bool Pvr_GetTrackingIPDEnabled();
+bool Pvr_GetEyeTrackingAutoIPD(float *autoIPD);
 
 int Pxr_GetEyeOrientation(int eyeIndex,PxrQuaternionf *orientation);
 // AppFocus
