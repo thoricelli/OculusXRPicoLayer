@@ -54,8 +54,9 @@ bool ovrp_RecenterPose() {
 
 //NON-LEGACY
 void UnityPluginLoad(void *unityInterfaces) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
-    Pxr_UnityPluginLoad(unityInterfaces);
+    //Crashes the game...
+    /*
+    Pxr_UnityPluginLoad(unityInterfaces);*/
 }
 Sizei ovrp_GetEyeTextureSize(Eye eyeId) {
     Sizei sizeiDummy;
@@ -65,18 +66,62 @@ bool ovrp_SetOverlayQuad2(bool onTop, bool headLocked, intptr_t texture, intptr_
     return 0;
 }
 Posef ovrp_GetNodePose(Node nodeId) {
-    Posef posefDummy;
-    return posefDummy;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
+                                                       "nodeId: %d",
+                        __func__,
+                        nodeId);
+    PxrSensorState sensorState;
+    PxrControllerTracking tracking;
+
+    int sensorFrameIndex;
+
+    Posef poseStateDummy;
+
+    switch (nodeId) {
+        case EyeCenter:
+        case Head:
+            //Weird smooth head movement? Or is this only due to my test app?
+
+            Pxr_GetPredictedMainSensorState(0, &sensorState, &sensorFrameIndex);
+
+            Posef poseHeadState = {
+                    .Orientation = *((Quatf*)&sensorState.pose.orientation),
+                    .Position = *((Vector3f*)&sensorState.pose.position),
+            };
+
+            return poseHeadState;
+            break;
+        case HandLeft:
+        case HandRight:
+            Pxr_GetControllerTrackingState(nodeId - 3, 0, NULL, &tracking);
+
+            Posef poseControllerState = {
+                    .Orientation = *((Quatf*)&tracking.localControllerPose.pose.orientation),
+                    .Position = *((Vector3f*)&tracking.localControllerPose.pose.position),
+            };
+
+            return poseControllerState;
+        default:
+            return poseStateDummy;
+            break;
+    }
 }
+
+/*Posef getPositionForController() {
+
+}*/
+
 bool ovrp_SetControllerVibration(uint controllerMask, float frequency, float amplitude) {
     return 0;
 }
 Posef ovrp_GetNodeVelocity(Node nodeId) {
     Posef posefDummy;
+    
     return posefDummy;
 }
 Posef ovrp_GetNodeAcceleration(Node nodeId) {
     Posef posefDummy;
+    
     return posefDummy;
 }
 TrackingOrigin ovrp_GetTrackingOriginType() {
@@ -95,7 +140,7 @@ bool ovrp_RecenterTrackingOrigin(uint flags) {
     return 0;
 }
 bool ovrp_GetInitialized() {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
+    
     return Pxr_IsInitialized();
 }
 intptr_t ovrp_GetVersion() {
@@ -135,21 +180,40 @@ bool ovrp_SetTrackingPositionEnabled(bool value) {
     return 0;
 }
 bool ovrp_GetNodePresent(Node nodeId) {
-    return 0;
+    
+    return 1;
 }
 bool ovrp_GetNodeOrientationTracked(Node nodeId) {
-    return 0;
+    
+    return 1;
 }
 bool ovrp_GetNodePositionTracked(Node nodeId) {
-    return 0;
+    
+    return 1;
 }
 Frustumf ovrp_GetNodeFrustum(Node nodeId) {
     Frustumf frustumfDummy;
     return frustumfDummy;
 }
 ControllerState ovrp_GetControllerState(uint controllerMask) {
-    ControllerState controllerStateDummy;
-    return controllerStateDummy;
+    
+
+    PxrControllerInputState controllerRight;
+    Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerRight);
+
+    PxrControllerInputState controllerLeft;
+    Pxr_GetControllerInputState(PXR_CONTROLLER_LEFT, &controllerLeft);
+
+    ControllerState controllerState = {
+            .ConnectedControllers = 2,
+            .LIndexTrigger = controllerLeft.triggerValue,
+            .RIndexTrigger = controllerRight.triggerValue,
+            //TODO, translate to float.
+            /*.LThumbstick = controllerLeft.Joystick,
+            .RThumbstick = controllerRight.Joystick,*/
+    };
+
+    return controllerState;
 }
 // Deprecated. Replaced by ovrp_GetSuggestedCpuPerformanceLevel
 int ovrp_GetSystemCpuLevel() {
@@ -323,14 +387,17 @@ bool ovrp_Update2(int stateId, int frameIndex, double predictionSeconds) {
 }
 Posef ovrp_GetNodePose2(int stateId, Node nodeId) {
     Posef posefDummy;
+    
     return posefDummy;
 }
 Posef ovrp_GetNodeVelocity2(int stateId, Node nodeId) {
     Posef posefDummy;
+    
     return posefDummy;
 }
 Posef ovrp_GetNodeAcceleration2(int stateId, Node nodeId) {
     Posef posefDummy;
+    
     return posefDummy;
 }
 enum SystemHeadset ovrp_GetSystemHeadsetType() {
@@ -362,12 +429,52 @@ float ovrp_GetAppFramerate() {
     return 0;
 }
 PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
+                                                       "stepId: %d"
+                                                       "nodeId: %d",
+                                                       __func__,
+                                                       stepId,
+                                                       nodeId);
+    PxrSensorState sensorState;
+    int sensorFrameIndex;
+
     PoseStatef poseStatefDummy;
-    return poseStatefDummy;
+
+    switch (nodeId) {
+        case EyeCenter:
+        case Head:
+            Pxr_GetPredictedMainSensorState(0, &sensorState, &sensorFrameIndex);
+
+            PoseStatef poseHeadState = {
+              .Velocity = *((Vector3f*)&sensorState.linearVelocity),
+              .Acceleration = *((Vector3f*)&sensorState.linearAcceleration),
+              .AngularVelocity = *((Vector3f*)&sensorState.angularVelocity),
+              .AngularAcceleration = *((Vector3f*)&sensorState.angularAcceleration),
+            };
+
+            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s has returned head sensor data!", __func__ );
+
+            return poseHeadState;
+            break;
+        default:
+            return poseStatefDummy;
+            break;
+    }
 }
 ControllerState2 ovrp_GetControllerState2(uint controllerMask) {
-    ControllerState2 controllerState2Dummy;
-    return controllerState2Dummy;
+
+    
+
+    PxrControllerInputState controllerRight;
+    Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerRight);
+
+    ControllerState2 controllerState = {
+            .ConnectedControllers = 1,
+            //TODO
+            .RIndexTrigger = controllerRight.triggerValue,
+    };
+
+    return controllerState;
 }
 Result ovrp_InitializeMixedReality() {
     return 0;
@@ -413,6 +520,7 @@ Result ovrp_EnqueueSubmitLayer(uint flags, intptr_t textureLeft, intptr_t textur
     return 0;
 }
 Result ovrp_GetNodeFrustum2(Node nodeId, Frustumf2 *nodeFrustum) {
+    
     return 0;
 }
 bool ovrp_GetEyeTextureArrayEnabled() {
@@ -446,6 +554,7 @@ Result ovrp_GetCameraDeviceColorFrameBgraPixels(CameraDevice cameraDevice, intpt
     return 0;
 }
 Result ovrp_GetControllerState4(uint controllerMask, ControllerState4 *controllerState) {
+    
     return 0;
 }
 
@@ -543,6 +652,7 @@ Result ovrp_GetHeadPoseModifier(Quatf *relativeRotation, Vector3f *relativeTrans
     return 0;
 }
 Result ovrp_GetNodePoseStateRaw(Step stepId, int frameIndex, Node nodeId, PoseStatef *nodePoseState) {
+    
     return 0;
 }
 Result ovrp_GetCurrentTrackingTransformPose(Posef *trackingTransformPose) {
@@ -643,9 +753,11 @@ Result ovrp_SetDeveloperMode(bool active) {
     return 0;
 }
 Result ovrp_GetNodeOrientationValid(Node nodeId, bool *nodeOrientationValid) {
+    
     return 0;
 }
 Result ovrp_GetNodePositionValid(Node nodeId, bool *nodePositionValid) {
+    
     return 0;
 }
 Result ovrp_GetAdaptiveGpuPerformanceScale2(float *adaptiveGpuPerformanceScale) {
@@ -865,6 +977,7 @@ Result ovrp_GetKeyboardState(Step stepId, int frameIndex, KeyboardState *keyboar
     return 0;
 }
 Result ovrp_GetNodePoseStateImmediate(Node nodeId, PoseStatef *nodePoseState) {
+    
     return 0;
 }
 Result ovrp_SetLogCallback2(LogCallback2DelegateType logCallback) {

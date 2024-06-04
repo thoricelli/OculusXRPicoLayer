@@ -33,12 +33,12 @@ bool GetIsSupportedDevice() {
 }
 
 bool LoadOVRPlugin(char *ovrpPath) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
+    
     return Pxr_LoadPlugin();
 }
 
 void UnloadOVRPlugin() {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
+    
     return Pxr_UnloadPlugin();
 }
 

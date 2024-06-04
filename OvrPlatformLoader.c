@@ -15,37 +15,34 @@
 // Initialization
 
 bool ovr_UnityInitWrapper(char *appId) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s was called!", __func__);
     return ppf_UnityInitWrapper(appId) == ppfPlatformInitializeResult_Success;
 }
 
 // Initializes just the global variables to use the Unity api without calling the init logic
 
 void ovr_UnityInitGlobals(intptr_t loggingCB) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__ );
     return;
 }
 unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s was called!", __func__);
     ppf_UnityInitAsynchronousWrapper(appId);
     return 0x1AD307B4; //Platform_InitializeAndroidAsynchronous, not sure if I can just return what ppf_UnityInitAsynchronousWrapper outputs.
 }
 bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    
     return ppf_UnityInitWrapper("0") == ppfPlatformInitializeResult_Success;
 }
 unsigned long ovr_Platform_InitializeStandaloneOculus(OculusInitParams* init) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    
     ppf_UnityInitWrapper("0");
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessToken(uint64_t appId, char *accessToken) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    
     ppf_UnityInitWrapper("0");
     return 0x1AD307B4;
 }
 unsigned long ovr_PlatformInitializeWithAccessTokenAndOptions(uint64_t appId, char *accessToken, ovrKeyValuePair configOptions[], uintptr_t numOptions) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
+    
     ppf_UnityInitWrapper((char *)&appId);
     return 0x1AD307B4;
 }
