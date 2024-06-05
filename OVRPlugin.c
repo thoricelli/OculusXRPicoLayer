@@ -65,24 +65,35 @@ Sizei ovrp_GetEyeTextureSize(Eye eyeId) {
 bool ovrp_SetOverlayQuad2(bool onTop, bool headLocked, intptr_t texture, intptr_t device, Posef pose, Vector3f scale) {
     return 0;
 }
-Posef ovrp_GetNodePose(Node nodeId) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
-                                                       "nodeId: %d",
-                        __func__,
-                        nodeId);
-    PxrSensorState sensorState;
+
+Posef getPosefForController(int deviceID) {
     PxrControllerTracking tracking;
+    float *headSensorData;
+
+    Pxr_GetHeadSensorData(headSensorData);
+    Pxr_GetControllerTrackingState(deviceID, 0, headSensorData, &tracking);
+
+    Posef poseControllerState = {
+            .Orientation = *((Quatf*)&tracking.localControllerPose.pose.orientation),
+            .Position = *((Vector3f*)&tracking.localControllerPose.pose.position),
+    };
+    return poseControllerState;
+}
+
+Posef ovrp_GetNodePose(Node nodeId) {
+    PxrSensorState2 sensorState;
 
     int sensorFrameIndex;
+    double predictedDisplayTimeMS;
 
     Posef poseStateDummy;
 
     switch (nodeId) {
         case EyeCenter:
         case Head:
-            //Weird smooth head movement? Or is this only due to my test app?
+            Pxr_GetPredictedDisplayTime(&predictedDisplayTimeMS);
 
-            Pxr_GetPredictedMainSensorState(0, &sensorState, &sensorFrameIndex);
+            Pxr_GetPredictedMainSensorState2(predictedDisplayTimeMS, &sensorState, &sensorFrameIndex);
 
             Posef poseHeadState = {
                     .Orientation = *((Quatf*)&sensorState.pose.orientation),
@@ -93,23 +104,12 @@ Posef ovrp_GetNodePose(Node nodeId) {
             break;
         case HandLeft:
         case HandRight:
-            Pxr_GetControllerTrackingState(nodeId - 3, 0, NULL, &tracking);
-
-            Posef poseControllerState = {
-                    .Orientation = *((Quatf*)&tracking.localControllerPose.pose.orientation),
-                    .Position = *((Vector3f*)&tracking.localControllerPose.pose.position),
-            };
-
-            return poseControllerState;
+            return getPosefForController(nodeId - 3);
         default:
             return poseStateDummy;
             break;
     }
 }
-
-/*Posef getPositionForController() {
-
-}*/
 
 bool ovrp_SetControllerVibration(uint controllerMask, float frequency, float amplitude) {
     return 0;
@@ -195,26 +195,59 @@ Frustumf ovrp_GetNodeFrustum(Node nodeId) {
     Frustumf frustumfDummy;
     return frustumfDummy;
 }
-ControllerState ovrp_GetControllerState(uint controllerMask) {
-    
 
-    PxrControllerInputState controllerRight;
-    Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerRight);
+int getConnectedControllers() {
+    int connectedControllers = 2;
 
-    PxrControllerInputState controllerLeft;
-    Pxr_GetControllerInputState(PXR_CONTROLLER_LEFT, &controllerLeft);
-
-    ControllerState controllerState = {
-            .ConnectedControllers = 2,
-            .LIndexTrigger = controllerLeft.triggerValue,
-            .RIndexTrigger = controllerRight.triggerValue,
-            //TODO, translate to float.
-            /*.LThumbstick = controllerLeft.Joystick,
-            .RThumbstick = controllerRight.Joystick,*/
-    };
-
-    return controllerState;
+    //Check controller status
+    connectedControllers -= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_LEFT);
+    connectedControllers -= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_RIGHT);
+    return connectedControllers;
 }
+
+uint getButtonsFromState(PxrControllerInputState pxrState, uint start) {
+    uint state = 0;
+    state |= pxrState.AXValue * Button_One
+    state |= pxrState.BYValue * Button_Two
+    return state;
+}
+
+//Refer to Controller enum.
+ControllerState getControllerState(uint controllerMask) {
+
+    PxrControllerInputState controllerState;
+    ControllerState state;
+
+    state.Buttons = 0;
+
+    if (controllerMask & LTouch) {
+        Pxr_GetControllerInputState(PXR_CONTROLLER_LEFT, &controllerState);
+
+        state.Buttons |= getButtonsFromState(controllerState, LeftController_Start);
+
+        state.LIndexTrigger = controllerState.triggerValue;
+        state.LHandTrigger = controllerState.gripValue;
+        state.LThumbstick = *((Vector2f*)&controllerState.Joystick);
+    }
+
+    if (controllerMask & RTouch) {
+        Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerState);
+
+        state.Buttons |= getButtonsFromState(controllerState, RightController_Start);
+
+        state.RIndexTrigger = controllerState.triggerValue;
+        state.RHandTrigger = controllerState.gripValue;
+        state.RThumbstick = *((Vector2f*)&controllerState.Joystick);
+    }
+
+    state.ConnectedControllers = getConnectedControllers();
+    return state;
+}
+
+ControllerState ovrp_GetControllerState(uint controllerMask) {
+    return getControllerState(controllerMask);
+}
+
 // Deprecated. Replaced by ovrp_GetSuggestedCpuPerformanceLevel
 int ovrp_GetSystemCpuLevel() {
     return 0;
@@ -429,12 +462,12 @@ float ovrp_GetAppFramerate() {
     return 0;
 }
 PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
+    /*__android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
                                                        "stepId: %d"
                                                        "nodeId: %d",
                                                        __func__,
                                                        stepId,
-                                                       nodeId);
+                                                       nodeId);*/
     PxrSensorState sensorState;
     int sensorFrameIndex;
 
@@ -451,8 +484,6 @@ PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
               .AngularVelocity = *((Vector3f*)&sensorState.angularVelocity),
               .AngularAcceleration = *((Vector3f*)&sensorState.angularAcceleration),
             };
-
-            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s has returned head sensor data!", __func__ );
 
             return poseHeadState;
             break;
