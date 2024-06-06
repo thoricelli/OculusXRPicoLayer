@@ -107,7 +107,7 @@ typedef enum ControllerButtons_
 typedef enum ControllerType_
 {
     RightController_Start = 0,
-    LeftController_Start = 0x80000000,
+    LeftController_Start = 0x00000008,
 } ControllerType;
 
 typedef enum Button_

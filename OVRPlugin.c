@@ -205,10 +205,10 @@ int getConnectedControllers() {
     return connectedControllers;
 }
 
-uint getButtonsFromState(PxrControllerInputState pxrState, uint start) {
+uint getButtonsFromState(PxrControllerInputState pxrState, uint shift) {
     uint state = 0;
-    state |= pxrState.AXValue * Button_One;
-    state |= pxrState.BYValue * Button_Two;
+    state |= pxrState.AXValue * Button_One << shift;
+    state |= pxrState.BYValue * Button_Two << shift;
     return state;
 }
 
