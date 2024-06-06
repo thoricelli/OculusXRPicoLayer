@@ -22,6 +22,6 @@ Don't forget to add the toolchain /bin/ to your path! <br>
 | Game | Works    | Doesn't work    |
 | :---:   | :---: | :---: |
 | Keep Talking and Nobody Explodes | Fully functional | / |
-| Waltz of the Wizard | Sound | No video. |
+| Waltz of the Wizard | Sound | No video |
 
 More games are to be tested soon.
