@@ -207,8 +207,8 @@ int getConnectedControllers() {
 
 uint getButtonsFromState(PxrControllerInputState pxrState, uint start) {
     uint state = 0;
-    state |= pxrState.AXValue * Button_One
-    state |= pxrState.BYValue * Button_Two
+    state |= pxrState.AXValue * Button_One;
+    state |= pxrState.BYValue * Button_Two;
     return state;
 }
 
