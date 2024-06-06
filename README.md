@@ -17,3 +17,11 @@ Feel free to contribute with a PR!
 - Run either the `compile_windows.ps1` powershell script or the `compile_linux.bash` bash script. <br>
 Don't forget to add the toolchain /bin/ to your path! <br>
 (TODO is to make a Makefile...)
+
+# List of working games
+| Game | Works    | Doesn't work    |
+| :---:   | :---: | :---: |
+| Keep Talking and Nobody Explodes | Fully functional | / |
+| Waltz of the Wizard | Sound | No video. |
+
+More games are to be tested soon.
