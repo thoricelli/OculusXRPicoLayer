@@ -24,8 +24,6 @@ Don't forget to add the toolchain /bin/ to your path! <br>
 | Keep Talking and Nobody Explodes | Fully functional | / |
 | Waltz of the Wizard | Sound | No video |
 
-(All OpenVR games should work, however non-OpenVR games are not yet implemented)
-
 More games are to be tested soon.
 
 # APKs
