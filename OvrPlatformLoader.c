@@ -14,8 +14,15 @@
 
 // Initialization
 
+//These are entitlement checks!
+//https://developer.oculus.com/documentation/unity/ps-entitlement-check/
+
+intptr_t lastMessage = 0x0;
+
 bool ovr_UnityInitWrapper(char *appId) {
-    return ppf_UnityInitWrapper(appId) == ppfPlatformInitializeResult_Success;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+    //ppf_UnityInitWrapper(appId);
+    return 1;
 }
 
 // Initializes just the global variables to use the Unity api without calling the init logic
@@ -23,28 +30,25 @@ bool ovr_UnityInitWrapper(char *appId) {
 void ovr_UnityInitGlobals(intptr_t loggingCB) {
     return;
 }
+
 unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
-    ppf_UnityInitAsynchronousWrapper(appId);
-    return 0x1AD307B4; //Platform_InitializeAndroidAsynchronous, not sure if I can just return what ppf_UnityInitAsynchronousWrapper outputs.
+    lastMessage = Platform_InitializeAndroidAsynchronous;
+    return Platform_InitializeAndroidAsynchronous;
 }
 bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
-    
-    return ppf_UnityInitWrapper("0") == ppfPlatformInitializeResult_Success;
+    return 1;
 }
 unsigned long ovr_Platform_InitializeStandaloneOculus(OculusInitParams* init) {
-    
-    ppf_UnityInitWrapper("0");
-    return 0x1AD307B4;
+    lastMessage = Platform_InitializeStandaloneOculus;
+    return Platform_InitializeStandaloneOculus;
 }
 unsigned long ovr_PlatformInitializeWithAccessToken(uint64_t appId, char *accessToken) {
-    
-    ppf_UnityInitWrapper("0");
-    return 0x1AD307B4;
+    lastMessage = Platform_InitializeWithAccessToken;
+    return Platform_InitializeWithAccessToken;
 }
 unsigned long ovr_PlatformInitializeWithAccessTokenAndOptions(uint64_t appId, char *accessToken, ovrKeyValuePair configOptions[], uintptr_t numOptions) {
-    
-    ppf_UnityInitWrapper((char *)&appId);
-    return 0x1AD307B4;
+    lastMessage = Platform_InitializeWithAccessToken;
+    return Platform_InitializeWithAccessToken;
 }
 
 //We are NOT on Windows!
@@ -52,7 +56,7 @@ bool ovr_UnityInitWrapperWindows(char *appId, intptr_t loggingCB) {
     return 0;
 }
 unsigned long ovr_UnityInitWrapperWindowsAsynchronous(char *appId, intptr_t loggingCB) {
-    return 0x1AD307B4;
+    return Platform_InitializeWindowsAsynchronous;
 }
 
 bool ovr_SetDeveloperAccessToken(char *accessToken) {
@@ -66,7 +70,9 @@ intptr_t ovr_GetLoggedInUserLocale() {
 // Message queue access
 
 intptr_t ovr_PopMessage() {
-    return 0;
+    intptr_t saved = lastMessage;
+    lastMessage = 0;
+    return saved;
 }
 void ovr_FreeMessage(intptr_t message) {
     return;
@@ -132,7 +138,7 @@ void ovr_ApplicationLifecycle_LogDeeplinkResult(intptr_t trackingID, LaunchResul
 
 // Other?
 
-unsigned long ovr_HTTP_StartTransfer(intptr_t url, ovrKeyValuePair headers[], uintptr_t numItems) {
+unsigned long ovr_HTTP_StartTransfer(char *url, ovrKeyValuePair headers[], uintptr_t numItems) {
     return 0;
 }
 bool ovr_HTTP_Write(unsigned long transferId, uint8_t *bytes, uintptr_t length) {
@@ -460,7 +466,8 @@ unsigned long ovr_Colocation_ShareMap(intptr_t uuid) {
     return 0;
 }
 unsigned long ovr_Entitlement_GetIsViewerEntitled() {
-    return 0;
+    lastMessage = ovrMessage_Entitlement_GetIsViewerEntitled;
+    return ovrMessage_Entitlement_GetIsViewerEntitled;
 }
 unsigned long ovr_GraphAPI_Get(intptr_t url) {
     return 0;
@@ -871,6 +878,12 @@ unsigned long ovr_User_TestUserCreateDeviceManifest(intptr_t deviceID, uint64_t 
     return 0;
 }
 unsigned long ovr_UserDataStore_PrivateDeleteEntryByKey(uint64_t userID, intptr_t key) {
+    return 0;
+}
+unsigned long ovr_UserAgeCategory_Get() {
+    return 0;
+}
+unsigned long ovr_UserAgeCategory_Report(AppAgeCategory age_category) {
     return 0;
 }
 unsigned long ovr_UserDataStore_PrivateGetEntries(uint64_t userID) {
@@ -1864,7 +1877,7 @@ intptr_t ovr_Message_GetMicrophoneAvailabilityState(intptr_t obj) {
     return 0;
 }
 intptr_t ovr_Message_GetNativeMessage(intptr_t obj) {
-    return 0;
+    return obj;
 }
 intptr_t ovr_Message_GetNetSyncConnection(intptr_t obj) {
     return 0;
@@ -1917,8 +1930,8 @@ intptr_t ovr_Message_GetPurchaseArray(intptr_t obj) {
 intptr_t ovr_Message_GetRejoinDialogResult(intptr_t obj) {
     return 0;
 }
-unsigned long ovr_Message_GetRequestID(intptr_t obj) {
-    return 0;
+uint64_t ovr_Message_GetRequestID(intptr_t obj) {
+    return obj;
 }
 intptr_t ovr_Message_GetRoom(intptr_t obj) {
     return 0;
@@ -1948,7 +1961,8 @@ intptr_t ovr_Message_GetSystemVoipState(intptr_t obj) {
     return 0;
 }
 MessageType ovr_Message_GetType(intptr_t obj) {
-    return 0;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! And wanted type: %lu", __func__, obj);
+    return (MessageType)obj;
 }
 intptr_t ovr_Message_GetUser(intptr_t obj) {
     return 0;

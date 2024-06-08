@@ -21,27 +21,6 @@ typedef enum Eye_
     Count = 2
 } Eye;
 
-typedef struct Quatf_
-{
-    float x;
-    float y;
-    float z;
-    float w;
-} Quatf;
-
-typedef struct Vector3f
-{
-    float x;
-    float y;
-    float z;
-} Vector3f;
-
-typedef struct Posef_
-{
-    Quatf Orientation;
-    Vector3f Position;
-} Posef;
-
 
 typedef enum Node_
 {
@@ -258,8 +237,14 @@ typedef struct AppPerfStats_
 typedef enum EyeTextureFormat_
 {
     Default = 0,
+    R8G8B8A8_sRGB = 0,
+    R8G8B8A8 = 1,
     R16G16B16A16_FP = 2,
     R11G11B10_FP = 3,
+    B8G8R8A8_sRGB = 4,
+    B8G8R8A8 = 5,
+    R5G6B5 = 11,
+    EyeTextureFormat_EnumSize = 0x7fffffff
 } EyeTextureFormat;
 
 typedef struct PoseStatef_
@@ -918,14 +903,6 @@ typedef enum PlatformCameraMode_
     PlatformCameraMode_EnumSize = 0x7fffffff
 } PlatformCameraMode;
 
-typedef struct Colorf_
-{
-    float r;
-    float g;
-    float b;
-    float a;
-} Colorf;
-
 typedef enum InsightPassthroughStyleFlags_
 {
     HasTextureOpacityFactor = 1 << 0,
@@ -1166,10 +1143,329 @@ typedef struct SceneCaptureRequestInternal_
     char *request;
 } SceneCaptureRequestInternal;
 
-//Nowhere to be found?
-/*typedef struct RenderAPIType_
+typedef enum RenderAPIType_
 {
+    RenderAPI_None   = 0,       ///< No API
+    RenderAPI_OpenGL = 1,       ///< OpenGL
+    RenderAPI_D3D11  = 2,       ///< DirectX 11
+    RenderAPI_D3D12  = 3,        ///< DirectX 12
+} RenderAPIType;
 
-} RenderAPIType;*/
+typedef enum RenderModelFlags_
+{
+    SupportsGltf20Subset1 = 1,
+    SupportsGltf20Subset2 = 2,
+} RenderModelFlags;
+
+typedef enum PassthroughCapabilityFlags_
+{
+    Passthrough = 1 << 0,
+    Color       = 1 << 1,
+    Depth       = 1 << 2
+} PassthroughCapabilityFlags;
+
+typedef enum SpaceLocationFlags_
+{
+    /// <summary>
+    /// Indicates that the pose field's orientation field contains valid data.
+    /// </summary>
+    /// <remarks>
+    /// Applications must not read a pose field's orientation if this flag is unset.
+    /// </remarks>
+    OrientationValid = 0x00000001,
+
+    /// <summary>
+    /// Indicates that the pose field's position field contains valid data.
+    /// </summary>
+    /// <remarks>
+    /// Applications must not read a pose field's position if this flag is unset.
+    /// </remarks>
+    PositionValid = 0x00000002,
+
+    /// <summary>
+    /// Indicates that a pose field's orientation field represents an actively tracked orientation.
+    /// </summary>
+    /// <remarks>
+    /// When a space location tracking an object whose orientation is no longer known during tracking loss
+    /// (e.g. an observed QR code), the orientation will be a valid but untracked orientation and will be
+    /// meaningful to use.
+    /// </remarks>
+    OrientationTracked = 0x00000004,
+
+    /// <summary>
+    /// Indicates that a pose field's position field represents an actively tracked position.
+    /// </summary>
+    /// <remarks>
+    /// When a space location loses tracking, the position will be a valid but untracked value that is inferred or
+    /// last-known, e.g. based on neck model updates, inertial dead reckoning, or a last-known position, and will be
+    /// meaningful to use.
+    /// </remarks>
+    PositionTracked = 0x00000008,
+} SpaceLocationFlags;
+
+typedef struct BodyJointLocation_
+{
+    /// <summary>
+    /// The <see cref="SpaceLocationFlags"/> for this <see cref="BodyJointLocation"/>.
+    /// </summary>
+    SpaceLocationFlags LocationFlags;
+
+    /// <summary>
+    /// The pose of this <see cref="BodyJointLocation"/>.
+    /// </summary>
+    Posef Pose;
+
+    /// <summary>
+    /// Indicates that the <see cref="Pose"/>'s <see cref="Posef.Orientation"/> contains valid data.
+    /// </summary>
+    bool OrientationValid;// = (LocationFlags & SpaceLocationFlags.OrientationValid) != 0;
+
+    /// <summary>
+    /// Indicates that the <see cref="Pose"/>'s <see cref="Posef.Position"/> contains valid data.
+    /// </summary>
+    bool PositionValid;// = (LocationFlags & SpaceLocationFlags.PositionValid) != 0;
+
+    /// <summary>
+    /// Indicates that the <see cref="Pose"/>'s <see cref="Posef.Orientation"/> represents an actively tracked
+    /// orientation.
+    /// </summary>
+    bool OrientationTracked;// = (LocationFlags & SpaceLocationFlags.OrientationTracked) != 0;
+
+    /// <summary>
+    /// Indicates that the <see cref="Pose"/>'s <see cref="Posef.Position"/> represents an actively tracked
+    /// position.
+    /// </summary>
+    bool PositionTracked;// = (LocationFlags & SpaceLocationFlags.PositionTracked) != 0;
+} BodyJointLocation;
+
+typedef struct BodyStateInternal_
+{
+    bool IsActive;
+    float Confidence;
+    uint64_t SkeletonChangedCount;
+    double Time;
+    BodyJointLocation JointLocation_0;
+    BodyJointLocation JointLocation_1;
+    BodyJointLocation JointLocation_2;
+    BodyJointLocation JointLocation_3;
+    BodyJointLocation JointLocation_4;
+    BodyJointLocation JointLocation_5;
+    BodyJointLocation JointLocation_6;
+    BodyJointLocation JointLocation_7;
+    BodyJointLocation JointLocation_8;
+    BodyJointLocation JointLocation_9;
+    BodyJointLocation JointLocation_10;
+    BodyJointLocation JointLocation_11;
+    BodyJointLocation JointLocation_12;
+    BodyJointLocation JointLocation_13;
+    BodyJointLocation JointLocation_14;
+    BodyJointLocation JointLocation_15;
+    BodyJointLocation JointLocation_16;
+    BodyJointLocation JointLocation_17;
+    BodyJointLocation JointLocation_18;
+    BodyJointLocation JointLocation_19;
+    BodyJointLocation JointLocation_20;
+    BodyJointLocation JointLocation_21;
+    BodyJointLocation JointLocation_22;
+    BodyJointLocation JointLocation_23;
+    BodyJointLocation JointLocation_24;
+    BodyJointLocation JointLocation_25;
+    BodyJointLocation JointLocation_26;
+    BodyJointLocation JointLocation_27;
+    BodyJointLocation JointLocation_28;
+    BodyJointLocation JointLocation_29;
+    BodyJointLocation JointLocation_30;
+    BodyJointLocation JointLocation_31;
+    BodyJointLocation JointLocation_32;
+    BodyJointLocation JointLocation_33;
+    BodyJointLocation JointLocation_34;
+    BodyJointLocation JointLocation_35;
+    BodyJointLocation JointLocation_36;
+    BodyJointLocation JointLocation_37;
+    BodyJointLocation JointLocation_38;
+    BodyJointLocation JointLocation_39;
+    BodyJointLocation JointLocation_40;
+    BodyJointLocation JointLocation_41;
+    BodyJointLocation JointLocation_42;
+    BodyJointLocation JointLocation_43;
+    BodyJointLocation JointLocation_44;
+    BodyJointLocation JointLocation_45;
+    BodyJointLocation JointLocation_46;
+    BodyJointLocation JointLocation_47;
+    BodyJointLocation JointLocation_48;
+    BodyJointLocation JointLocation_49;
+    BodyJointLocation JointLocation_50;
+    BodyJointLocation JointLocation_51;
+    BodyJointLocation JointLocation_52;
+    BodyJointLocation JointLocation_53;
+    BodyJointLocation JointLocation_54;
+    BodyJointLocation JointLocation_55;
+    BodyJointLocation JointLocation_56;
+    BodyJointLocation JointLocation_57;
+    BodyJointLocation JointLocation_58;
+    BodyJointLocation JointLocation_59;
+    BodyJointLocation JointLocation_60;
+    BodyJointLocation JointLocation_61;
+    BodyJointLocation JointLocation_62;
+    BodyJointLocation JointLocation_63;
+    BodyJointLocation JointLocation_64;
+    BodyJointLocation JointLocation_65;
+    BodyJointLocation JointLocation_66;
+    BodyJointLocation JointLocation_67;
+    BodyJointLocation JointLocation_68;
+    BodyJointLocation JointLocation_69;
+} BodyStateInternal;
+
+typedef struct FaceExpressionStatusInternal_
+{
+    bool IsValid;
+    bool IsEyeFollowingBlendshapesValid;
+} FaceExpressionStatusInternal;
+
+typedef struct FaceStateInternal_
+{
+    float ExpressionWeights_0;
+    float ExpressionWeights_1;
+    float ExpressionWeights_2;
+    float ExpressionWeights_3;
+    float ExpressionWeights_4;
+    float ExpressionWeights_5;
+    float ExpressionWeights_6;
+    float ExpressionWeights_7;
+    float ExpressionWeights_8;
+    float ExpressionWeights_9;
+    float ExpressionWeights_10;
+    float ExpressionWeights_11;
+    float ExpressionWeights_12;
+    float ExpressionWeights_13;
+    float ExpressionWeights_14;
+    float ExpressionWeights_15;
+    float ExpressionWeights_16;
+    float ExpressionWeights_17;
+    float ExpressionWeights_18;
+    float ExpressionWeights_19;
+    float ExpressionWeights_20;
+    float ExpressionWeights_21;
+    float ExpressionWeights_22;
+    float ExpressionWeights_23;
+    float ExpressionWeights_24;
+    float ExpressionWeights_25;
+    float ExpressionWeights_26;
+    float ExpressionWeights_27;
+    float ExpressionWeights_28;
+    float ExpressionWeights_29;
+    float ExpressionWeights_30;
+    float ExpressionWeights_31;
+    float ExpressionWeights_32;
+    float ExpressionWeights_33;
+    float ExpressionWeights_34;
+    float ExpressionWeights_35;
+    float ExpressionWeights_36;
+    float ExpressionWeights_37;
+    float ExpressionWeights_38;
+    float ExpressionWeights_39;
+    float ExpressionWeights_40;
+    float ExpressionWeights_41;
+    float ExpressionWeights_42;
+    float ExpressionWeights_43;
+    float ExpressionWeights_44;
+    float ExpressionWeights_45;
+    float ExpressionWeights_46;
+    float ExpressionWeights_47;
+    float ExpressionWeights_48;
+    float ExpressionWeights_49;
+    float ExpressionWeights_50;
+    float ExpressionWeights_51;
+    float ExpressionWeights_52;
+    float ExpressionWeights_53;
+    float ExpressionWeights_54;
+    float ExpressionWeights_55;
+    float ExpressionWeights_56;
+    float ExpressionWeights_57;
+    float ExpressionWeights_58;
+    float ExpressionWeights_59;
+    float ExpressionWeights_60;
+    float ExpressionWeights_61;
+    float ExpressionWeights_62;
+    float ExpressionWeightConfidences_0;
+    float ExpressionWeightConfidences_1;
+    FaceExpressionStatusInternal Status;
+    double Time;
+} FaceStateInternal;
+
+typedef struct EyeGazeState_
+{
+    Posef Pose;
+    float Confidence;
+    bool IsValid;
+} EyeGazeState;
+
+typedef struct EyeGazesStateInternal_
+{
+    EyeGazeState EyeGazes_0;
+    EyeGazeState EyeGazes_1;
+    double Time;
+} EyeGazesStateInternal;
+
+typedef struct ControllerState5_
+{
+    uint64_t ConnectedControllers;
+    uint64_t Buttons;
+    uint64_t Touches;
+    uint64_t NearTouches;
+    float LIndexTrigger;
+    float RIndexTrigger;
+    float LHandTrigger;
+    float RHandTrigger;
+    Vector2f LThumbstick;
+    Vector2f RThumbstick;
+    Vector2f LTouchpad;
+    Vector2f RTouchpad;
+    char LBatteryPercentRemaining;
+    char RBatteryPercentRemaining;
+    char LRecenterCount;
+    char RRecenterCount;
+    float LThumbRestForce;
+    float RThumbRestForce;
+    float LStylusForce;
+    float RStylusForce;
+    float LIndexTriggerCurl;
+    float RIndexTriggerCurl;
+    float LIndexTriggerSlide;
+    float RIndexTriggerSlide;
+} ControllerState5;
+
+
+typedef enum HapticsLocation_
+{
+    HapticsLocation_None = 0x00,
+    HapticsLocation_Hand = 0x01,
+    HapticsLocation_Thumb = 0x02,
+    HapticsLocation_Index = 0x04,
+} HapticsLocation;
+
+
+typedef enum InteractionProfile
+{
+    InteractionProfile_None = 0,
+    InteractionProfile_Touch = 1,
+    InteractionProfile_TouchPro = 2,
+} InteractionProfile;
+
+typedef struct HapticsAmplitudeEnvelopeVibration_
+{
+    float Duration;
+    uint32_t AmplitudeCount;
+    intptr_t Amplitudes;
+} HapticsAmplitudeEnvelopeVibration;
+
+typedef struct HapticsPcmVibration_
+{
+    uint32_t BufferSize;
+    intptr_t Buffer;
+    float SampleRateHz;
+    bool Append;
+    uint32_t SamplesConsumed;
+} HapticsPcmVibration;
 
 #endif

@@ -1,2 +1,2 @@
 #define PLUGIN_NAME "OculusXRPicoLayer"
-#define OVRP_VERSION "1.11.0"
+#define OVRP_VERSION "1.78.0"

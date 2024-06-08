@@ -348,4 +348,11 @@ typedef enum PxrBlendFactor_ {
     PXR_BLEND_FACTOR_MAX_ENUM = 0xFFFFFFFF
 } PxrBlendFactor;
 
+typedef enum AppAgeCategory_
+{
+    AppAgeCategory_Unknown,
+    AppAgeCategory_Ch,
+    AppAgeCategory_Nch,
+} AppAgeCategory;
+
 #endif  // PXR_ENUMS_H

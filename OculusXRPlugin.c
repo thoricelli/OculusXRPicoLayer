@@ -166,11 +166,11 @@ void SetTiledMultiResDynamic(bool isDynamic) {
 }
 
 bool GetEyeTrackedFoveatedRenderingSupported() {
-    return true;
+    return false;
 }
 
 bool GetEyeTrackedFoveatedRenderingEnabled() {
-    return true;
+    return false;
 }
 
 void SetEyeTrackedFoveatedRenderingEnabled(bool isEnabled) {
@@ -182,27 +182,27 @@ bool GetShouldRestartSession() {
 }
 
 bool SetupEnvironmentDepth(EnvironmentDepthCreateParamsInternal* createParams) {
-    return true;
+    return false;
 }
 
 bool SetEnvironmentDepthRendering(bool isEnabled) {
-    return true;
+    return false;
 }
 
 bool ShutdownEnvironmentDepth() {
-    return true;
+    return false;
 }
 
 bool GetEnvironmentDepthTextureId(uint id) {
-    return true;
+    return false;
 }
 
 bool GetEnvironmentDepthFrameDesc(EnvironmentDepthFrameDescInternal* frameDesc, int eye) {
-    return true;
+    return false;
 }
 
 bool SetEnvironmentDepthHandRemoval(bool isEnabled) {
-    return true;
+    return false;
 }
 
 bool GetEnvironmentDepthSupported() {
@@ -210,5 +210,5 @@ bool GetEnvironmentDepthSupported() {
 }
 
 bool GetEnvironmentDepthHandRemovalSupported() {
-    return true;
+    return false;
 }

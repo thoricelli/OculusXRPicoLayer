@@ -12,16 +12,18 @@
 #include "/include/Globals.h"
 #include "/include/PxrPlatform.h"
 #include "/src/PxrUnityPluginLoader.c"
+#include "/src/PxrToOculusMapper.c"
 
 /* LEGACY (TODO) */
 bool ovrp_PreInitialize() {
-    return 0;
+    return 1;
 }
-bool ovrp_Initialize(/*RenderAPIType*/int apiType, intptr_t platformArgs) {
-    return 0;
+bool ovrp_Initialize(RenderAPIType apiType, intptr_t platformArgs) {
+    Pxr_SetGraphicOption(PXR_OPENGL_ES);
+    return Pxr_Initialize();
 }
 bool ovrp_Shutdown() {
-    return 0;
+    return Pxr_Shutdown();
 }
 bool ovrp_SetupDistortionWindow() {
     return 0;
@@ -36,7 +38,7 @@ bool ovrp_SetEyeTexture(Eye eyeId, intptr_t texture) {
     return 0;
 }
 bool ovrp_Update(int frameIndex) {
-    return 0;
+    return Pxr_WaitFrame();
 }
 bool ovrp_BeginFrame(int frameIndex) {
     return Pxr_BeginFrame();
@@ -531,27 +533,81 @@ Result ovrp_GetExternalCameraIntrinsics(int cameraId, CameraIntrinsics *cameraIn
 Result ovrp_GetExternalCameraExtrinsics(int cameraId, CameraExtrinsics *cameraExtrinsics) {
     return 0;
 }
+
+//LAYERS
 Result ovrp_CalculateLayerDesc(OverlayShape shape, LayerLayout layout, Sizei *textureSize,
                                int mipLevels, int sampleCount, EyeTextureFormat format, int layerFlags, LayerDesc *layerDesc) {
-    return 0;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+    LayerDesc layer = {
+            .Shape = shape,
+            .Layout = layout,
+            .TextureSize = *textureSize,
+            .MipLevels = mipLevels,
+            .SampleCount = sampleCount,
+            .Format = format,
+            .LayerFlags = layerFlags,
+    };
+    *layerDesc = layer;
+    return 1;
 }
 Result ovrp_EnqueueSetupLayer(LayerDesc *desc, intptr_t layerId) {
-    return 0;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+    PxrLayerParam layerParam = {
+        .layerId = layerId,
+        .layerShape = PXRConvertToOverLayShape(desc->Shape),
+        .layerType = PXR_OVERLAY,
+        .layerLayout = PXRConvertToLayerLayout(desc->Layout),
+        .format = *((uint64_t*)&desc->Format),
+        .width = desc->MaxViewportSize.w,
+        .height = desc->MaxViewportSize.h,
+        .sampleCount = desc->SampleCount,
+
+        .faceCount = 1,
+        .arraySize = 1,
+
+        .mipmapCount = desc->MipLevels,
+        .layerFlags = desc->LayerFlags,
+
+        .externalImageCount = 0,
+    };
+    return Pxr_CreateLayer(&layerParam);
 }
-Result ovrp_EnqueueDestroyLayer(intptr_t layerId) {
-    return 0;
+Result ovrp_EnqueueDestroyLayer(int *layerId) {
+    return Pxr_DestroyLayer(*layerId);
 }
-Result ovrp_GetLayerTextureStageCount(int layerId, int *layerTextureStageCount) {
-    return 0;
+Result ovrp_GetLayerTextureStageCount(int layerId, uint32_t *layerTextureStageCount) {
+    return Pxr_GetLayerImageCount(layerId, PXR_EYE_BOTH, layerTextureStageCount);
 }
-Result ovrp_GetLayerTexturePtr(int layerId, int stage, Eye eyeId, intptr_t *textureHandle) {
-    return 0;
+Result ovrp_GetLayerTexturePtr(int layerId, int stage, Eye eyeId, uint64_t *textureHandle) {
+    return Pxr_GetLayerImage(layerId, *((PxrEyeType*)&eyeId), stage, textureHandle);
 }
 Result ovrp_EnqueueSubmitLayer(uint flags, intptr_t textureLeft, intptr_t textureRight, int layerId, int frameIndex, Posef *pose, Vector3f *scale, int layerIndex) {
+    //Idfk
+    /*uint64_t* externalImages[2] = [&textureLeft, &textureLeft]
+
+    PxrLayerParam layerParam = {
+            .layerId = layerId,
+            .layerShape = PXRConvertToOverLayShape(desc->Shape),
+            .layerType = PXR_OVERLAY,
+            .layerLayout = PXRConvertToLayerLayout(desc->Layout),
+            .format = *((uint64_t*)&desc->Format),
+            .width = desc->MaxViewportSize.w,
+            .height = desc->MaxViewportSize.h,
+            .sampleCount = desc->SampleCount,
+
+            .faceCount = 1,
+            .arraySize = 1,
+
+            .mipmapCount = desc->MipLevels,
+            .layerFlags = flags,
+
+            .externalImageCount = 2,
+            .externalImages = externalImages,
+    };
+    return Pxr_CreateLayer(&layerParam);*/
     return 0;
 }
 Result ovrp_GetNodeFrustum2(Node nodeId, Frustumf2 *nodeFrustum) {
-    
     return 0;
 }
 bool ovrp_GetEyeTextureArrayEnabled() {
@@ -670,7 +726,28 @@ Result ovrp_GetDominantHand(Handedness *dominantHand) {
 Result ovrp_SendEvent(char *name, char *param) {
     return 0;
 }
-Result ovrp_EnqueueSetupLayer2(LayerDesc *desc, int compositionDepth, intptr_t layerId) {
+//Mem leak :(
+Result ovrp_EnqueueSetupLayer2(LayerDesc *desc, int compositionDepth, int *layerId) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! Format: %d, layerId: %d", __func__, desc->Format, *layerId);
+    PxrLayerParam layerParam = {
+            .layerId = (*layerId)+1,
+            .layerShape = PXRConvertToOverLayShape(desc->Shape),
+            .layerType = PXR_OVERLAY,
+            .layerLayout = PXRConvertToLayerLayout(desc->Layout),
+            .format = 0x8058,//*((int*)&desc->Format),
+            .width = desc->TextureSize.w,
+            .height = desc->TextureSize.h,
+            .sampleCount = desc->SampleCount,
+
+            .faceCount = 1,
+            .arraySize = 1,
+
+            .mipmapCount = desc->MipLevels,
+            .layerFlags = desc->LayerFlags,
+
+            .externalImageCount = 0,
+    };
+    //return Pxr_CreateLayer(&layerParam);
     return 0;
 }
 Result ovrp_GetLayerAndroidSurfaceObject(int layerId, intptr_t *surfaceObject) {
@@ -714,6 +791,7 @@ Result ovrp_AddCustomMetadata(char *name, char *param) {
     return 0;
 }
 Result ovrp_EnqueueSubmitLayer2(uint flags, intptr_t textureLeft, intptr_t textureRight, int layerId, int frameIndex, Posef *pose, Vector3f *scale, int layerIndex, bool overrideTextureRectMatrix, TextureRectMatrixf *textureRectMatrix, bool overridePerLayerColorScaleAndOffset, Vector4 *colorScale, Vector4 *colorOffset) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
     return 0;
 }
 Result ovrp_GetTrackingTransformRelativePose(Posef *trackingTransformRelativePose, TrackingOrigin trackingOrigin) {
@@ -788,16 +866,20 @@ Result ovrp_GetNodeOrientationValid(Node nodeId, bool *nodeOrientationValid) {
     return 0;
 }
 Result ovrp_GetNodePositionValid(Node nodeId, bool *nodePositionValid) {
-    
     return 0;
 }
 Result ovrp_GetAdaptiveGpuPerformanceScale2(float *adaptiveGpuPerformanceScale) {
     return 0;
 }
 Result ovrp_GetHandTrackingEnabled(bool *handTrackingEnabled) {
-    return 0;
+    return Pxr_GetHandTrackingEnabled(handTrackingEnabled);;
 }
 Result ovrp_GetHandState(Step stepId, Hand hand, HandStateInternal *handState) {
+    PxrHandState pxrHandState;
+    Pxr_GetHandTrackingHandState(*((PxrHandType*)&hand), 0, &pxrHandState);
+    //Assign the converted handstateinternal to that of the convert function.
+    HandStateInternal converted = PxrHandStateToOVRHandState(pxrHandState);
+    handState = &converted;
     return 0;
 }
 Result ovrp_GetSkeleton(SkeletonType skeletonType, Skeleton *skeleton) {
@@ -1105,5 +1187,150 @@ Result ovrp_GetSpaceBoundary2D(uint64_t *space, PolygonalBoundary2DInternal *bou
     return 0;
 }
 Result ovrp_RequestSceneCapture(SceneCaptureRequestInternal *request, uint64_t *requestId) {
+    return 0;
+}
+
+//NEW
+Result ovrp_GetSpaceUuid(uint64_t *space, Guid *uuid) {
+    return 0;
+}
+
+
+Result ovrp_CreateVirtualKeyboard(VirtualKeyboardCreateInfo createInfo) {
+    return 0;
+}
+
+
+Result ovrp_DestroyVirtualKeyboard() {
+    return 0;
+}
+
+
+Result ovrp_SendVirtualKeyboardInput(VirtualKeyboardInputInfo inputInfo, Posef *interactorRootPose) {
+    return 0;
+}
+
+
+Result ovrp_ChangeVirtualKeyboardTextContext(char *textContext) {
+    return 0;
+}
+
+
+Result ovrp_CreateVirtualKeyboardSpace(VirtualKeyboardSpaceCreateInfo createInfo, uint64_t *keyboardSpace) {
+    return 0;
+}
+
+
+Result ovrp_SuggestVirtualKeyboardLocation(VirtualKeyboardLocationInfo locationInfo) {
+    return 0;
+}
+
+
+Result ovrp_GetVirtualKeyboardScale(float *location) {
+    return 0;
+}
+
+
+Result ovrp_GetVirtualKeyboardSound(VirtualKeyboardSoundInternal *sound) {
+    return 0;
+}
+
+
+Result ovrp_GetVirtualKeyboardSwipeTrailState(VirtualKeyboardSwipeTrailState *swipeTrailState) {
+    return 0;
+}
+
+Result ovrp_GetRenderModelProperties2(char *path, RenderModelFlags flags, RenderModelPropertiesInternal *properties) {
+    return 0;
+}
+Result ovrp_GetNodePoseStateAtTime(double time, Node nodeId, PoseStatef *nodePoseState) {
+    return 0;
+}
+Result ovrp_GetPassthroughCapabilityFlags(PassthroughCapabilityFlags *capabilityFlags) {
+    return 0;
+}
+Result ovrp_GetFoveationEyeTrackedSupported(bool *foveationSupported) {
+    return 0;
+}
+Result ovrp_GetFoveationEyeTracked(bool *isEyeTrackedFoveation) {
+    return 0;
+}
+Result ovrp_SetFoveationEyeTracked(bool isEyeTrackedFoveation) {
+    return 0;
+}
+Result ovrp_StartFaceTracking() {
+    return 0;
+}
+Result ovrp_StopFaceTracking() {
+    return 0;
+}
+Result ovrp_StartBodyTracking() {
+    return 0;
+}
+Result ovrp_StopBodyTracking() {
+    return 0;
+}
+Result ovrp_StartEyeTracking() {
+    return 0;
+}
+Result ovrp_StopEyeTracking() {
+    return 0;
+}
+Result ovrp_GetEyeTrackingSupported(bool *eyeTrackingSupported) {
+    return 0;
+}
+Result ovrp_GetFaceTrackingSupported(bool *faceTrackingSupported) {
+    return 0;
+}
+Result ovrp_GetBodyTrackingEnabled(bool *value) {
+    return 0;
+}
+Result ovrp_GetBodyTrackingSupported(bool *value) {
+    return 0;
+}
+Result ovrp_GetBodyState(Step stepId, int frameIndex, BodyStateInternal *bodyState) {
+    return 0;
+}
+Result ovrp_GetFaceTrackingEnabled(bool *faceTrackingEnabled) {
+    return 0;
+}
+Result ovrp_GetFaceState(Step stepId, int frameIndex, FaceStateInternal *faceState) {
+    return 0;
+}
+Result ovrp_GetEyeTrackingEnabled(bool *eyeTrackingEnabled) {
+    return 0;
+}
+Result ovrp_GetEyeGazesState(Step stepId, int frameIndex, EyeGazesStateInternal *eyeGazesState) {
+    return 0;
+}
+Result ovrp_GetControllerState5(uint controllerMask, ControllerState5 *controllerState) {
+    return 0;
+}
+Result ovrp_SetControllerLocalizedVibration(Controller controllerMask, HapticsLocation hapticsLocationMask, float frequency, float amplitude) {
+    return 0;
+}
+Result ovrp_GetLocalDimmingSupported(bool *localDimmingSupported) {
+    return 0;
+}
+Result ovrp_SetLocalDimming(bool localDimmingMode) {
+    return 0;
+}
+Result ovrp_GetLocalDimming(bool *localDimmingMode) {
+    return 0;
+}
+Result ovrp_GetCurrentInteractionProfile(Hand hand, InteractionProfile *interactionProfile) {
+    return 0;
+}
+Result ovrp_SetControllerHapticsAmplitudeEnvelope(
+        Controller controllerMask,
+        HapticsAmplitudeEnvelopeVibration hapticsVibration) {
+    return 0;
+}
+Result ovrp_SetControllerHapticsPcm(
+        Controller controllerMask,
+        HapticsPcmVibration hapticsVibration) {
+    return 0;
+}
+Result ovrp_GetControllerSampleRateHz(Controller controller, float *sampleRateHz) {
     return 0;
 }

@@ -5,6 +5,35 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+typedef struct Colorf_
+{
+    float r;
+    float g;
+    float b;
+    float a;
+} Colorf;
+
+typedef struct Quatf_
+{
+    float x;
+    float y;
+    float z;
+    float w;
+} Quatf;
+
+typedef struct Vector3f
+{
+    float x;
+    float y;
+    float z;
+} Vector3f;
+
+typedef struct Posef_
+{
+    Quatf Orientation;
+    Vector3f Position;
+} Posef;
+
 typedef struct _ovrpVector4f {
     float x;
     float y;
@@ -93,5 +122,78 @@ typedef struct EnvironmentDepthFrameDescInternal {
     float minDepth;
     float maxDepth;
 } EnvironmentDepthFrameDescInternal;
+
+typedef struct VirtualKeyboardCreateInfo_
+{
+} VirtualKeyboardCreateInfo;
+
+
+typedef enum VirtualKeyboardInputSource_
+{
+    VirtualKeyboardInputSource_Invalid = 0,
+    VirtualKeyboardInputSource_ControllerRayLeft = 1,
+    VirtualKeyboardInputSource_ControllerRayRight = 2,
+    VirtualKeyboardInputSource_HandRayLeft = 3,
+    VirtualKeyboardInputSource_HandRayRight = 4,
+    VirtualKeyboardInputSource_ControllerDirectLeft = 5,
+    VirtualKeyboardInputSource_ControllerDirectRight = 6,
+    VirtualKeyboardInputSource_HandDirectIndexTipLeft = 7,
+    VirtualKeyboardInputSource_HandDirectIndexTipRight = 8,
+    VirtualKeyboardInputSource_EnumSize = 0x7FFFFFFF,
+} VirtualKeyboardInputSource;
+
+typedef enum VirtualKeyboardInputStateFlags_
+{
+    IsPressed = 0x0000000000000001,
+} VirtualKeyboardInputStateFlags;
+
+typedef struct VirtualKeyboardInputInfo_
+{
+    VirtualKeyboardInputSource inputSource;
+    Posef inputPose;
+    VirtualKeyboardInputStateFlags inputState;
+} VirtualKeyboardInputInfo;
+
+typedef enum VirtualKeyboardLocationType_
+{
+    Custom = 0,
+    Far = 1,
+    Direct = 2
+} VirtualKeyboardLocationType;
+
+typedef struct VirtualKeyboardSpaceCreateInfo_
+{
+    VirtualKeyboardLocationType locationType;
+    // Pose only set if locationType == Custom
+    Posef pose;
+} VirtualKeyboardSpaceCreateInfo;
+
+typedef struct VirtualKeyboardLocationInfo_
+{
+    VirtualKeyboardLocationType locationType;
+    // Pose & Scale only set if locationType == Custom
+    Posef pose;
+    float scale;
+} VirtualKeyboardLocationInfo;
+
+typedef struct VirtualKeyboardSoundInternal_
+{
+    uint32_t SoundId;
+    uint32_t Channels;
+    uint32_t Frequency;
+    uint32_t SoundCapacityInput;
+    uint32_t SoundCountOutput;
+    intptr_t SoundBuffer;
+} VirtualKeyboardSoundInternal;
+
+typedef struct VirtualKeyboardSwipeTrailState_
+{
+    float lifetimeSeconds;
+    Colorf color;
+    float startWidth;
+    uint32_t shapeCapacityInput;
+    uint32_t shapeCountOutput;
+    intptr_t shape;
+} VirtualKeyboardSwipeTrailState;
 
 #endif
