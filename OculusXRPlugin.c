@@ -61,6 +61,7 @@ Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
 //God, theres different versions of UserDefinedSettings... :(
 void SetUserDefinedSettings(UserDefinedSettings *settings) {
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "Hello World! Made by thoricelli.");
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called with stereoRenderingMode: %d, colorSpace: %d, optimizeBufferDiscards: %d, spaceWarp: %d, lateLatchingDebug: %d", __func__, settings->stereoRenderingMode, settings->colorSpace, settings->optimizeBufferDiscards, settings->spaceWarp, settings->lateLatchingDebug);
 
     PICO_UserDefinedSettings picoUserDefinedSettings =
     {
@@ -70,7 +71,7 @@ void SetUserDefinedSettings(UserDefinedSettings *settings) {
         .useContentProtect = 0,
         .optimizeBufferDiscards = settings->optimizeBufferDiscards,
         .enableAppSpaceWarp = settings->spaceWarp,
-        .enableSubsampled = 1,
+        .enableSubsampled = 0,
         .lateLatchingDebug = settings->lateLatchingDebug,
         .enableStageMode = 0,
     };

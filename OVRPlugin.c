@@ -68,41 +68,59 @@ bool ovrp_SetOverlayQuad2(bool onTop, bool headLocked, intptr_t texture, intptr_
     return 0;
 }
 
-Posef getPosefForController(int deviceID) {
+PoseStatef getPosefStateForController(int deviceID) {
     PxrControllerTracking tracking;
     float *headSensorData;
 
     Pxr_GetHeadSensorData(headSensorData);
     Pxr_GetControllerTrackingState(deviceID, 0, headSensorData, &tracking);
 
-    Posef poseControllerState = {
-            .Orientation = *((Quatf*)&tracking.localControllerPose.pose.orientation),
-            .Position = *((Vector3f*)&tracking.localControllerPose.pose.position),
+    PoseStatef poseStatef = {
+            .Pose = *((Posef*)&tracking.localControllerPose.pose),
+            .Velocity = *((Vector3f*)&tracking.localControllerPose.linearVelocity),
+            .Acceleration = *((Vector3f*)&tracking.localControllerPose.linearAcceleration),
+            .AngularVelocity = *((Vector3f*)&tracking.localControllerPose.angularVelocity),
+            .AngularAcceleration = *((Vector3f*)&tracking.localControllerPose.angularAcceleration),
     };
-    return poseControllerState;
+    return poseStatef;
 }
 
-Posef ovrp_GetNodePose(Node nodeId) {
-    PxrSensorState2 sensorState;
-
+PoseStatef getPosefStateForSensor() {
     int sensorFrameIndex;
     double predictedDisplayTimeMS;
 
+    PxrSensorState2 sensorState;
+
+    Pxr_GetPredictedDisplayTime(&predictedDisplayTimeMS);
+
+    Pxr_GetPredictedMainSensorState2(predictedDisplayTimeMS, &sensorState, &sensorFrameIndex);
+
+    PoseStatef poseStatef = {
+            .Pose = *((Posef*)&sensorState.pose),
+            .Velocity = *((Vector3f*)&sensorState.linearVelocity),
+            .Acceleration = *((Vector3f*)&sensorState.linearAcceleration),
+            .AngularVelocity = *((Vector3f*)&sensorState.angularVelocity),
+            .AngularAcceleration = *((Vector3f*)&sensorState.angularVelocity),
+    };
+
+    return poseStatef;
+}
+
+Posef getPosefForController(int deviceID) {
+    return getPosefStateForController(deviceID).Pose;
+}
+
+Posef getPosefForSensor() {
+    return getPosefStateForSensor().Pose;
+}
+
+Posef GetNodePose(Node nodeId) {
     Posef poseStateDummy;
 
     switch (nodeId) {
         case EyeCenter:
         case Head:
-            Pxr_GetPredictedDisplayTime(&predictedDisplayTimeMS);
-
-            Pxr_GetPredictedMainSensorState2(predictedDisplayTimeMS, &sensorState, &sensorFrameIndex);
-
-            Posef poseHeadState = {
-                    .Orientation = *((Quatf*)&sensorState.pose.orientation),
-                    .Position = *((Vector3f*)&sensorState.pose.position),
-            };
-
-            return poseHeadState;
+            return getPosefForSensor();
             break;
         case HandLeft:
         case HandRight:
@@ -111,6 +129,28 @@ Posef ovrp_GetNodePose(Node nodeId) {
             return poseStateDummy;
             break;
     }
+}
+
+PoseStatef GetNodePoseState(Node nodeId) {
+    PoseStatef poseStateDummy;
+
+    switch (nodeId) {
+        case EyeCenter:
+        case Head:
+            return getPosefStateForSensor();
+            break;
+        case HandLeft:
+        case HandRight:
+            return getPosefStateForController(nodeId - 3);
+        default:
+            return poseStateDummy;
+            break;
+    }
+}
+
+Posef ovrp_GetNodePose(Node nodeId) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+    return GetNodePose(nodeId);
 }
 
 bool ovrp_SetControllerVibration(uint controllerMask, float frequency, float amplitude) {
@@ -300,7 +340,7 @@ bool ovrp_SetAppMonoscopic(bool value) {
     return 0;
 }
 bool ovrp_GetAppHasVrFocus() {
-    return 0;
+    return 1;
 }
 bool ovrp_GetAppShouldQuit() {
     return 0;
@@ -421,9 +461,9 @@ bool ovrp_Update2(int stateId, int frameIndex, double predictionSeconds) {
     return 0;
 }
 Posef ovrp_GetNodePose2(int stateId, Node nodeId) {
-    Posef posefDummy;
-    
-    return posefDummy;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+    //TODO: StateId?
+    return GetNodePose(nodeId);
 }
 Posef ovrp_GetNodeVelocity2(int stateId, Node nodeId) {
     Posef posefDummy;
@@ -464,50 +504,13 @@ float ovrp_GetAppFramerate() {
     return 0;
 }
 PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
-    /*__android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! with params:"
-                                                       "stepId: %d"
-                                                       "nodeId: %d",
-                                                       __func__,
-                                                       stepId,
-                                                       nodeId);*/
-    PxrSensorState sensorState;
-    int sensorFrameIndex;
-
-    PoseStatef poseStatefDummy;
-
-    switch (nodeId) {
-        case EyeCenter:
-        case Head:
-            Pxr_GetPredictedMainSensorState(0, &sensorState, &sensorFrameIndex);
-
-            PoseStatef poseHeadState = {
-              .Velocity = *((Vector3f*)&sensorState.linearVelocity),
-              .Acceleration = *((Vector3f*)&sensorState.linearAcceleration),
-              .AngularVelocity = *((Vector3f*)&sensorState.angularVelocity),
-              .AngularAcceleration = *((Vector3f*)&sensorState.angularAcceleration),
-            };
-
-            return poseHeadState;
-            break;
-        default:
-            return poseStatefDummy;
-            break;
-    }
+    return GetNodePoseState(nodeId);
 }
 ControllerState2 ovrp_GetControllerState2(uint controllerMask) {
-
-    
-
-    PxrControllerInputState controllerRight;
-    Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerRight);
-
-    ControllerState2 controllerState = {
-            .ConnectedControllers = 1,
-            //TODO
-            .RIndexTrigger = controllerRight.triggerValue,
-    };
-
-    return controllerState;
+    ControllerState state = getControllerState(controllerMask);
+    ControllerState2 base = *((ControllerState2*)&state);
+    //Add more.
+    return base;
 }
 Result ovrp_InitializeMixedReality() {
     return 0;
@@ -641,7 +644,8 @@ Result ovrp_GetCameraDeviceColorFrameBgraPixels(CameraDevice cameraDevice, intpt
     return 0;
 }
 Result ovrp_GetControllerState4(uint controllerMask, ControllerState4 *controllerState) {
-    
+    ControllerState state = getControllerState(controllerMask);
+    *controllerState = *((ControllerState4*)&state);
     return 0;
 }
 
@@ -691,6 +695,7 @@ Result ovrp_GetHandNodePoseStateLatency(double *latencyInSeconds) {
     return 0;
 }
 Result ovrp_GetAppHasInputFocus(bool *appHasInputFocus) {
+    *appHasInputFocus = 1;
     return 0;
 }
 Result ovrp_GetTiledMultiResSupported(bool *foveationSupported) {
@@ -760,7 +765,7 @@ Result ovrp_GetHeadPoseModifier(Quatf *relativeRotation, Vector3f *relativeTrans
     return 0;
 }
 Result ovrp_GetNodePoseStateRaw(Step stepId, int frameIndex, Node nodeId, PoseStatef *nodePoseState) {
-    
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0;
 }
 Result ovrp_GetCurrentTrackingTransformPose(Posef *trackingTransformPose) {
@@ -872,20 +877,32 @@ Result ovrp_GetAdaptiveGpuPerformanceScale2(float *adaptiveGpuPerformanceScale) 
     return 0;
 }
 Result ovrp_GetHandTrackingEnabled(bool *handTrackingEnabled) {
-    return Pxr_GetHandTrackingEnabled(handTrackingEnabled);;
+    return Pxr_GetHandTrackingEnabled(handTrackingEnabled);
+}
+void GetPXRHandStateForOVR(int hand, HandStateInternal *handState) {
+
+    //Get aim state.
+    PxrHandAimState aimState;
+    Pxr_GetHandTrackerAimState(hand, &aimState);
+
+    //Get the joint locations
+    PxrHandJointsLocations jointsLocations;
+    Pxr_GetHandTrackerJointLocations(hand, &jointsLocations);
+
+    PxrHandCombinedStateToOVRHandState(aimState, jointsLocations, handState);
 }
 Result ovrp_GetHandState(Step stepId, Hand hand, HandStateInternal *handState) {
-    PxrHandState pxrHandState;
-    Pxr_GetHandTrackingHandState(*((PxrHandType*)&hand), 0, &pxrHandState);
-    //Assign the converted handstateinternal to that of the convert function.
-    HandStateInternal converted = PxrHandStateToOVRHandState(pxrHandState);
-    handState = &converted;
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called!", __func__);
+
+    GetPXRHandStateForOVR(hand, handState);
     return 0;
 }
 Result ovrp_GetSkeleton(SkeletonType skeletonType, Skeleton *skeleton) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0;
 }
 Result ovrp_GetMesh(MeshType meshType, intptr_t meshPtr) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0;
 }
 Result ovrp_OverrideExternalCameraFov(int cameraId, bool useOverriddenFov, Fovf *fov) {
@@ -1090,7 +1107,7 @@ Result ovrp_GetKeyboardState(Step stepId, int frameIndex, KeyboardState *keyboar
     return 0;
 }
 Result ovrp_GetNodePoseStateImmediate(Node nodeId, PoseStatef *nodePoseState) {
-    
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0;
 }
 Result ovrp_SetLogCallback2(LogCallback2DelegateType logCallback) {
@@ -1244,6 +1261,7 @@ Result ovrp_GetRenderModelProperties2(char *path, RenderModelFlags flags, Render
     return 0;
 }
 Result ovrp_GetNodePoseStateAtTime(double time, Node nodeId, PoseStatef *nodePoseState) {
+    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     return 0;
 }
 Result ovrp_GetPassthroughCapabilityFlags(PassthroughCapabilityFlags *capabilityFlags) {
@@ -1304,6 +1322,8 @@ Result ovrp_GetEyeGazesState(Step stepId, int frameIndex, EyeGazesStateInternal 
     return 0;
 }
 Result ovrp_GetControllerState5(uint controllerMask, ControllerState5 *controllerState) {
+    ControllerState state = getControllerState(controllerMask);
+    *controllerState = *((ControllerState5*)&state);
     return 0;
 }
 Result ovrp_SetControllerLocalizedVibration(Controller controllerMask, HapticsLocation hapticsLocationMask, float frequency, float amplitude) {
