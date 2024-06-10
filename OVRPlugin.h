@@ -153,7 +153,7 @@ typedef enum SystemRegion_
 typedef struct HapticsDesc_
 {
     int SampleRateHz;
-    int SampleSizeInBytes;
+    int SampleSizeInchars;
     int MinimumSafeSamplesQueued;
     int MinimumBufferSamplesCount;
     int OptimalBufferSamplesCount;
@@ -1116,8 +1116,8 @@ typedef struct Boundsf_
 
 typedef struct SpaceSemanticLabelInternal_
 {
-    int byteCapacityInput;
-    int byteCountOutput;
+    int charCapacityInput;
+    int charCountOutput;
     intptr_t labels;
 } SpaceSemanticLabelInternal;
 
@@ -1139,7 +1139,7 @@ typedef struct PolygonalBoundary2DInternal_
 
 typedef struct SceneCaptureRequestInternal_
 {
-    int requestByteCount;
+    int requestcharCount;
     char *request;
 } SceneCaptureRequestInternal;
 
@@ -1467,5 +1467,543 @@ typedef struct HapticsPcmVibration_
     bool Append;
     uint32_t SamplesConsumed;
 } HapticsPcmVibration;
+
+typedef struct SpaceLocationf_
+{
+    SpaceLocationFlags locationFlags;
+    Posef pose;
+} SpaceLocationf;
+
+typedef struct TriangleMeshInternal_
+{
+    int vertexCapacityInput;
+    int vertexCountOutput;
+    intptr_t vertices;
+    int indexCapacityInput;
+    int indexCountOutput;
+    intptr_t indices;
+} TriangleMeshInternal;
+
+typedef struct ControllerState6_
+{
+    uint32_t ConnectedControllers;
+    uint32_t Buttons;
+    uint32_t Touches;
+    uint32_t NearTouches;
+    float LIndexTrigger;
+    float RIndexTrigger;
+    float LHandTrigger;
+    float RHandTrigger;
+    Vector2f LThumbstick;
+    Vector2f RThumbstick;
+    Vector2f LTouchpad;
+    Vector2f RTouchpad;
+    char LBatteryPercentRemaining;
+    char RBatteryPercentRemaining;
+    char LRecenterCount;
+    char RRecenterCount;
+    float LThumbRestForce;
+    float RThumbRestForce;
+    float LStylusForce;
+    float RStylusForce;
+    float LIndexTriggerCurl;
+    float RIndexTriggerCurl;
+    float LIndexTriggerSlide;
+    float RIndexTriggerSlide;
+    float LIndexTriggerForce;
+    float RIndexTriggerForce;
+} ControllerState6;
+
+typedef struct VirtualKeyboardModelAnimationStatesInternal_
+{
+    uint32_t StateCapacityInput;
+    uint32_t StateCountOutput;
+    intptr_t StatesBuffer;
+} VirtualKeyboardModelAnimationStatesInternal;
+
+typedef struct VirtualKeyboardTextureIdsInternal_
+{
+    uint32_t TextureIdCapacityInput;
+    uint32_t TextureIdCountOutput;
+    intptr_t TextureIdsBuffer;
+} VirtualKeyboardTextureIdsInternal;
+
+typedef struct VirtualKeyboardTextureData_
+{
+    uint32_t TextureWidth;
+    uint32_t TextureHeight;
+    uint32_t BufferCapacityInput;
+    uint32_t BufferCountOutput;
+    intptr_t Buffer;
+} VirtualKeyboardTextureData;
+
+typedef struct VirtualKeyboardModelVisibility_
+{
+    bool Visible;
+} VirtualKeyboardModelVisibility;
+
+typedef enum PassthroughColorLutChannels_
+{
+    Rgb = 1,
+    Rgba = 2
+} PassthroughColorLutChannels;
+
+typedef struct PassthroughColorLutData_
+{
+    uint32_t BufferSize;
+    intptr_t Buffer;
+} PassthroughColorLutData;
+
+typedef struct InsightPassthroughStyle2_
+{
+    InsightPassthroughStyleFlags Flags;
+    float TextureOpacityFactor;
+    Colorf EdgeColor;
+    InsightPassthroughColorMapType TextureColorMapType;
+    uint32_t TextureColorMapDataSize;
+    intptr_t TextureColorMapData;
+    uint64_t LutSource;
+    uint64_t LutTarget;
+    float LutWeight;
+} InsightPassthroughStyle2;
+
+typedef enum QplResultType_
+{
+    QplResultType_Success = 2,
+    QplResultType_Fail = 3,
+    QplResultType_Cancel = 4
+} QplResultType;
+
+typedef enum PassthroughCapabilityFields_
+{
+    Flags = 1 << 0,
+    MaxColorLutResolution = 1 << 1,
+} PassthroughCapabilityFields;
+
+typedef struct PassthroughCapabilities_
+{
+    PassthroughCapabilityFields Fields;
+    PassthroughCapabilityFlags Flags;
+    uint32_t MaxColorLutResolution;
+} PassthroughCapabilities;
+
+typedef enum PassthroughPreferenceFields_
+{
+    PassthroughPreferenceFields_Flags = 1 << 0
+} PassthroughPreferenceFields;
+
+typedef enum PassthroughPreferenceFlags_
+{
+    DefaultToActive = 1 << 0
+} PassthroughPreferenceFlags;
+
+typedef struct PassthroughPreferences_
+{
+    PassthroughPreferenceFields Fields;
+    PassthroughPreferenceFlags Flags;
+} PassthroughPreferences;
+
+typedef enum LayerSharpenType_
+{
+    LayerSharpenType_None = 0,
+    LayerSharpenType_Normal = 1 << 13,
+    LayerSharpenType_Quality = 1 << 16,
+    LayerSharpenType_Automatic = 1 << 18,
+} LayerSharpenType;
+
+typedef struct FaceExpressionStatus_
+{
+    bool IsValid;
+    bool IsEyeFollowingBlendshapesValid;
+} FaceExpressionStatus;
+
+typedef enum FaceTrackingDataSource_
+{
+    Visual = 0,
+    Audio = 1,
+    FaceTrackingDataSource_Count = 2,
+} FaceTrackingDataSource;
+
+typedef struct FaceState_
+{
+    float *ExpressionWeights;
+    float *ExpressionWeightConfidences;
+    FaceExpressionStatus Status;
+    FaceTrackingDataSource DataSource;
+    double Time;
+} FaceState;
+
+typedef struct FaceState2Internal_
+{
+    float ExpressionWeights_0;
+    float ExpressionWeights_1;
+    float ExpressionWeights_2;
+    float ExpressionWeights_3;
+    float ExpressionWeights_4;
+    float ExpressionWeights_5;
+    float ExpressionWeights_6;
+    float ExpressionWeights_7;
+    float ExpressionWeights_8;
+    float ExpressionWeights_9;
+    float ExpressionWeights_10;
+    float ExpressionWeights_11;
+    float ExpressionWeights_12;
+    float ExpressionWeights_13;
+    float ExpressionWeights_14;
+    float ExpressionWeights_15;
+    float ExpressionWeights_16;
+    float ExpressionWeights_17;
+    float ExpressionWeights_18;
+    float ExpressionWeights_19;
+    float ExpressionWeights_20;
+    float ExpressionWeights_21;
+    float ExpressionWeights_22;
+    float ExpressionWeights_23;
+    float ExpressionWeights_24;
+    float ExpressionWeights_25;
+    float ExpressionWeights_26;
+    float ExpressionWeights_27;
+    float ExpressionWeights_28;
+    float ExpressionWeights_29;
+    float ExpressionWeights_30;
+    float ExpressionWeights_31;
+    float ExpressionWeights_32;
+    float ExpressionWeights_33;
+    float ExpressionWeights_34;
+    float ExpressionWeights_35;
+    float ExpressionWeights_36;
+    float ExpressionWeights_37;
+    float ExpressionWeights_38;
+    float ExpressionWeights_39;
+    float ExpressionWeights_40;
+    float ExpressionWeights_41;
+    float ExpressionWeights_42;
+    float ExpressionWeights_43;
+    float ExpressionWeights_44;
+    float ExpressionWeights_45;
+    float ExpressionWeights_46;
+    float ExpressionWeights_47;
+    float ExpressionWeights_48;
+    float ExpressionWeights_49;
+    float ExpressionWeights_50;
+    float ExpressionWeights_51;
+    float ExpressionWeights_52;
+    float ExpressionWeights_53;
+    float ExpressionWeights_54;
+    float ExpressionWeights_55;
+    float ExpressionWeights_56;
+    float ExpressionWeights_57;
+    float ExpressionWeights_58;
+    float ExpressionWeights_59;
+    float ExpressionWeights_60;
+    float ExpressionWeights_61;
+    float ExpressionWeights_62;
+    float ExpressionWeights_63;
+    float ExpressionWeights_64;
+    float ExpressionWeights_65;
+    float ExpressionWeights_66;
+    float ExpressionWeights_67;
+    float ExpressionWeights_68;
+    float ExpressionWeights_69;
+    float ExpressionWeightConfidences_0;
+    float ExpressionWeightConfidences_1;
+    FaceExpressionStatusInternal Status;
+    FaceTrackingDataSource DataSource;
+    double Time;
+} FaceState2Internal;
+
+typedef enum BodyTrackingFidelity2_
+{
+    BodyTrackingFidelity2_Low = 1,
+    BodyTrackingFidelity2_High = 2
+} BodyTrackingFidelity2;
+
+typedef struct BodyTrackingCalibrationInfo_
+{
+    float BodyHeight;
+} BodyTrackingCalibrationInfo;
+
+typedef enum BodyTrackingCalibrationState_
+{
+    BodyTrackingCalibrationState_Valid = 1,
+    BodyTrackingCalibrationState_Calibrating = 2,
+    BodyTrackingCalibrationState_Invalid = 3
+} BodyTrackingCalibrationState;
+
+typedef struct BodyState4Internal_
+{
+    bool IsActive;
+    float Confidence;
+    uint32_t SkeletonChangedCount;
+    double Time;
+    BodyJointLocation JointLocation_0;
+    BodyJointLocation JointLocation_1;
+    BodyJointLocation JointLocation_2;
+    BodyJointLocation JointLocation_3;
+    BodyJointLocation JointLocation_4;
+    BodyJointLocation JointLocation_5;
+    BodyJointLocation JointLocation_6;
+    BodyJointLocation JointLocation_7;
+    BodyJointLocation JointLocation_8;
+    BodyJointLocation JointLocation_9;
+    BodyJointLocation JointLocation_10;
+    BodyJointLocation JointLocation_11;
+    BodyJointLocation JointLocation_12;
+    BodyJointLocation JointLocation_13;
+    BodyJointLocation JointLocation_14;
+    BodyJointLocation JointLocation_15;
+    BodyJointLocation JointLocation_16;
+    BodyJointLocation JointLocation_17;
+    BodyJointLocation JointLocation_18;
+    BodyJointLocation JointLocation_19;
+    BodyJointLocation JointLocation_20;
+    BodyJointLocation JointLocation_21;
+    BodyJointLocation JointLocation_22;
+    BodyJointLocation JointLocation_23;
+    BodyJointLocation JointLocation_24;
+    BodyJointLocation JointLocation_25;
+    BodyJointLocation JointLocation_26;
+    BodyJointLocation JointLocation_27;
+    BodyJointLocation JointLocation_28;
+    BodyJointLocation JointLocation_29;
+    BodyJointLocation JointLocation_30;
+    BodyJointLocation JointLocation_31;
+    BodyJointLocation JointLocation_32;
+    BodyJointLocation JointLocation_33;
+    BodyJointLocation JointLocation_34;
+    BodyJointLocation JointLocation_35;
+    BodyJointLocation JointLocation_36;
+    BodyJointLocation JointLocation_37;
+    BodyJointLocation JointLocation_38;
+    BodyJointLocation JointLocation_39;
+    BodyJointLocation JointLocation_40;
+    BodyJointLocation JointLocation_41;
+    BodyJointLocation JointLocation_42;
+    BodyJointLocation JointLocation_43;
+    BodyJointLocation JointLocation_44;
+    BodyJointLocation JointLocation_45;
+    BodyJointLocation JointLocation_46;
+    BodyJointLocation JointLocation_47;
+    BodyJointLocation JointLocation_48;
+    BodyJointLocation JointLocation_49;
+    BodyJointLocation JointLocation_50;
+    BodyJointLocation JointLocation_51;
+    BodyJointLocation JointLocation_52;
+    BodyJointLocation JointLocation_53;
+    BodyJointLocation JointLocation_54;
+    BodyJointLocation JointLocation_55;
+    BodyJointLocation JointLocation_56;
+    BodyJointLocation JointLocation_57;
+    BodyJointLocation JointLocation_58;
+    BodyJointLocation JointLocation_59;
+    BodyJointLocation JointLocation_60;
+    BodyJointLocation JointLocation_61;
+    BodyJointLocation JointLocation_62;
+    BodyJointLocation JointLocation_63;
+    BodyJointLocation JointLocation_64;
+    BodyJointLocation JointLocation_65;
+    BodyJointLocation JointLocation_66;
+    BodyJointLocation JointLocation_67;
+    BodyJointLocation JointLocation_68;
+    BodyJointLocation JointLocation_69;
+    BodyJointLocation JointLocation_70;
+    BodyJointLocation JointLocation_71;
+    BodyJointLocation JointLocation_72;
+    BodyJointLocation JointLocation_73;
+    BodyJointLocation JointLocation_74;
+    BodyJointLocation JointLocation_75;
+    BodyJointLocation JointLocation_76;
+    BodyJointLocation JointLocation_77;
+    BodyJointLocation JointLocation_78;
+    BodyJointLocation JointLocation_79;
+    BodyJointLocation JointLocation_80;
+    BodyJointLocation JointLocation_81;
+    BodyJointLocation JointLocation_82;
+    BodyJointLocation JointLocation_83;
+    BodyTrackingCalibrationState CalibrationStatus;
+    BodyTrackingFidelity2 Fidelity;
+} BodyState4Internal;
+
+typedef struct Skeleton3Internal_
+{
+    SkeletonType Type;
+    uint NumBones;
+    uint NumBoneCapsules;
+    Bone Bones_0;
+    Bone Bones_1;
+    Bone Bones_2;
+    Bone Bones_3;
+    Bone Bones_4;
+    Bone Bones_5;
+    Bone Bones_6;
+    Bone Bones_7;
+    Bone Bones_8;
+    Bone Bones_9;
+    Bone Bones_10;
+    Bone Bones_11;
+    Bone Bones_12;
+    Bone Bones_13;
+    Bone Bones_14;
+    Bone Bones_15;
+    Bone Bones_16;
+    Bone Bones_17;
+    Bone Bones_18;
+    Bone Bones_19;
+    Bone Bones_20;
+    Bone Bones_21;
+    Bone Bones_22;
+    Bone Bones_23;
+    Bone Bones_24;
+    Bone Bones_25;
+    Bone Bones_26;
+    Bone Bones_27;
+    Bone Bones_28;
+    Bone Bones_29;
+    Bone Bones_30;
+    Bone Bones_31;
+    Bone Bones_32;
+    Bone Bones_33;
+    Bone Bones_34;
+    Bone Bones_35;
+    Bone Bones_36;
+    Bone Bones_37;
+    Bone Bones_38;
+    Bone Bones_39;
+    Bone Bones_40;
+    Bone Bones_41;
+    Bone Bones_42;
+    Bone Bones_43;
+    Bone Bones_44;
+    Bone Bones_45;
+    Bone Bones_46;
+    Bone Bones_47;
+    Bone Bones_48;
+    Bone Bones_49;
+    Bone Bones_50;
+    Bone Bones_51;
+    Bone Bones_52;
+    Bone Bones_53;
+    Bone Bones_54;
+    Bone Bones_55;
+    Bone Bones_56;
+    Bone Bones_57;
+    Bone Bones_58;
+    Bone Bones_59;
+    Bone Bones_60;
+    Bone Bones_61;
+    Bone Bones_62;
+    Bone Bones_63;
+    Bone Bones_64;
+    Bone Bones_65;
+    Bone Bones_66;
+    Bone Bones_67;
+    Bone Bones_68;
+    Bone Bones_69;
+    Bone Bones_70;
+    Bone Bones_71;
+    Bone Bones_72;
+    Bone Bones_73;
+    Bone Bones_74;
+    Bone Bones_75;
+    Bone Bones_76;
+    Bone Bones_77;
+    Bone Bones_78;
+    Bone Bones_79;
+    Bone Bones_80;
+    Bone Bones_81;
+    Bone Bones_82;
+    Bone Bones_83;
+    BoneCapsule BoneCapsules_0;
+    BoneCapsule BoneCapsules_1;
+    BoneCapsule BoneCapsules_2;
+    BoneCapsule BoneCapsules_3;
+    BoneCapsule BoneCapsules_4;
+    BoneCapsule BoneCapsules_5;
+    BoneCapsule BoneCapsules_6;
+    BoneCapsule BoneCapsules_7;
+    BoneCapsule BoneCapsules_8;
+    BoneCapsule BoneCapsules_9;
+    BoneCapsule BoneCapsules_10;
+    BoneCapsule BoneCapsules_11;
+    BoneCapsule BoneCapsules_12;
+    BoneCapsule BoneCapsules_13;
+    BoneCapsule BoneCapsules_14;
+    BoneCapsule BoneCapsules_15;
+    BoneCapsule BoneCapsules_16;
+    BoneCapsule BoneCapsules_17;
+    BoneCapsule BoneCapsules_18;
+} Skeleton3Internal;
+
+typedef enum BodyJointSet_
+{
+    BodyJointSet_None = -1,
+    BodyJointSet_UpperBody = 0,
+    BodyJointSet_FullBody = 1,
+} BodyJointSet;
+
+
+typedef enum VariantType_
+{
+    VariantType_None = 0,
+    VariantType_String = 1,
+    VariantType_Int = 2,
+    VariantType_Double = 3,
+    VariantType_Bool = 4,
+    VariantType_StringArray = 5,
+    VariantType_IntArray = 6,
+    VariantType_DoubleArray = 7,
+    VariantType_BoolArray = 8,
+} VariantType;
+
+typedef struct QplVariant_
+{
+    VariantType Type;
+    int Count;
+    unsigned long *StringValue;
+    long LongValue;
+    double DoubleValue;
+    bool BoolValue;
+    unsigned long **StringValues;
+    long *LongValues;
+    double *DoubleValues;
+    unsigned long *BoolValues;
+} QplVariant;
+
+typedef struct QplAnnotation_
+{
+    char *Key;
+    QplVariant Value;
+} QplAnnotation;
+
+typedef enum SpaceDiscoveryFilterType
+{
+    SpaceDiscoveryFilterType_None = 0,
+    SpaceDiscoveryFilterType_Ids = 2,
+    SpaceDiscoveryFilterType_Component = 3,
+} SpaceDiscoveryFilterType;
+
+typedef struct SpaceDiscoveryFilterInfoHeader_
+{
+    SpaceDiscoveryFilterType Type;
+} SpaceDiscoveryFilterInfoHeader;
+
+typedef struct SpaceDiscoveryInfo_
+{
+    uint32_t NumFilters;
+    SpaceDiscoveryFilterInfoHeader** Filters;
+} SpaceDiscoveryInfo;
+
+typedef struct SpaceDiscoveryResult_
+{
+    unsigned long Space;
+    Guid Uuid;
+} SpaceDiscoveryResult;
+
+typedef struct SpaceDiscoveryResults_
+{
+    uint32_t ResultCapacityInput;
+    uint32_t ResultCountOutput;
+    SpaceDiscoveryResult* Results;
+} SpaceDiscoveryResults;
 
 #endif

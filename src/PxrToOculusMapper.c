@@ -42,13 +42,35 @@ Quatf PxrPosefToOVRQuatf(PxrPosef posef) {
     return *((Quatf*)&posef.orientation);
 }
 
+Posef PxrPosefFlipped(PxrPosef posef) {
+    Posef flipped = *((Posef*)&posef);
+
+    flipped.Position.z = -flipped.Position.z;
+
+    flipped.Orientation.x = -flipped.Orientation.x;
+    flipped.Orientation.y = -flipped.Orientation.y;
+
+    return flipped;
+}
+
 void PxrHandCombinedStateToOVRHandState(
         PxrHandAimState aimState,
         PxrHandJointsLocations jointsLocations,
         HandStateInternal *handStateInternal
 ) {
+        Posef posefDummy;
+
+        posefDummy.Orientation.x = 0;
+        posefDummy.Orientation.y = 0;
+        posefDummy.Orientation.z = 0;
+        posefDummy.Orientation.w = 0;
+
+        posefDummy.Position.x = 0;
+        posefDummy.Position.y = 1;
+        posefDummy.Position.z = 0;
+
         handStateInternal->Status = aimState.Status;
-        handStateInternal->RootPose = *((Posef*)&aimState.aimPose);
+        handStateInternal->RootPose = posefDummy;
 
         handStateInternal->BoneRotations_0 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[0].pose);
         handStateInternal->BoneRotations_1 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[1].pose);
@@ -75,7 +97,7 @@ void PxrHandCombinedStateToOVRHandState(
         handStateInternal->BoneRotations_22 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[22].pose);
         handStateInternal->BoneRotations_23 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[23].pose);
 
-        //handStateInternal->Pinches = aimState.Pinches;
+        handStateInternal->Pinches = 0;//aimState.Pinches;
 
         handStateInternal->PinchStrength_0 = aimState.pinchStrengthIndex;
         handStateInternal->PinchStrength_1 = aimState.pinchStrengthMiddle;
@@ -83,15 +105,15 @@ void PxrHandCombinedStateToOVRHandState(
         handStateInternal->PinchStrength_3 = aimState.pinchStrengthLittle;
         handStateInternal->PinchStrength_4 = aimState.ClickStrength;
 
-        //handStateInternal->PointerPose = *((Posef*)&handState.PointerPose);
+        handStateInternal->PointerPose = posefDummy;//PxrPosefFlipped(aimState.aimPose);
         handStateInternal->HandScale = jointsLocations.HandScale;
-        //handStateInternal->HandConfidence = *((TrackingConfidence*)&handState.HandConfidence);
+        handStateInternal->HandConfidence = TrackingConfidence_High;//*((TrackingConfidence*)&handState.HandConfidence);
 
-        /*handStateInternal->FingerConfidences_0 = *((TrackingConfidence*)&handState.FingerConfidence[0]);
-        handStateInternal->FingerConfidences_1 = *((TrackingConfidence*)&handState.FingerConfidence[1]);
-        handStateInternal->FingerConfidences_2 = *((TrackingConfidence*)&handState.FingerConfidence[2]);
-        handStateInternal->FingerConfidences_3 = *((TrackingConfidence*)&handState.FingerConfidence[3]);
-        handStateInternal->FingerConfidences_4 = *((TrackingConfidence*)&handState.FingerConfidence[4]);*/
+        handStateInternal->FingerConfidences_0 = TrackingConfidence_High;
+        handStateInternal->FingerConfidences_1 = TrackingConfidence_High;
+        handStateInternal->FingerConfidences_2 = TrackingConfidence_High;
+        handStateInternal->FingerConfidences_3 = TrackingConfidence_High;
+        handStateInternal->FingerConfidences_4 = TrackingConfidence_High;
 
         /*handStateInternal->RequestedTimeStamp = handState.RequestedTimeStamp;
         handStateInternal->SampleTimeStamp = handState.SampleTimeStamp;*/
