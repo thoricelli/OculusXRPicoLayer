@@ -12,7 +12,7 @@
 #include "/include/PxrPlugin.h"
 
 #include "/include/Globals.h"
-#include "/src/include/Logger.h"
+#include "/src/Logger.c"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 

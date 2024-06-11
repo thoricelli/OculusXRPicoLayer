@@ -13,7 +13,7 @@
 #include "/include/PxrPlatformLoader.h"
 
 #include "/include/Globals.h"
-#include "/src/include/Logger.h"
+#include "/src/Logger.c"
 
 // Initialization
 intptr_t lastMessage = 0x0; //For the FreeMessage function.

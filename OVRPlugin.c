@@ -17,7 +17,7 @@
 #include "/include/Globals.h"
 #include "/src/PxrUnityPluginLoader.c"
 #include "/src/PxrToOculusMapper.c"
-#include "/src/include/Logger.h"
+#include "/src/Logger.c"
 
 /* LEGACY (TODO) */
 bool ovrp_PreInitialize() {

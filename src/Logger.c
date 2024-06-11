@@ -1,6 +1,15 @@
 #include <android/log.h>
-#include "./include/Logger.h"
 #include "../include/Globals.h"
+
+typedef enum CallFrequency_ {
+    NORMAL,
+    FREQUENT
+} CallFrequency;
+
+typedef enum LogFunctionType_ {
+    NON_IMPLEMENTED, //A function that is empty.
+    IMPLEMENTED //A function that is already fully implemented
+} LogFunctionType;
 
 //Logs that the function had been called.
 void LogFunction(LogFunctionType type, CallFrequency frequency, const char func[]) {
