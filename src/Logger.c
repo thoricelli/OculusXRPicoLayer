@@ -16,20 +16,20 @@ void LogFunction(LogFunctionType type, CallFrequency frequency, const char func[
     #if VERBOSE
         #if VERBOSITY_FUNCTIONS >= 0
         if (type == IMPLEMENTED && frequency == NORMAL)
-            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s has been called!", func);
+            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED] %s called.", func);
         #endif
         #if VERBOSITY_FUNCTIONS <= 0
         if (type == NON_IMPLEMENTED && frequency == NORMAL)
-            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called, but not implemented!", func);
+            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED] %s called.", func);
         #endif
 
         #if VERBOSITY_FUNCTIONS >= 0 && FUNCTIONS_ALLOW_SPAM
             if (type == IMPLEMENTED && frequency == FREQUENT)
-                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s has been called!", func);
+                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED, SPAM] %s called.", func);
         #endif
         #if VERBOSITY_FUNCTIONS <= 0 && FUNCTIONS_ALLOW_SPAM
             if (type == NON_IMPLEMENTED && frequency == FREQUENT)
-                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called, but not implemented!", func);
+                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED, SPAM] %s called.", func);
         #endif
     #endif
 }

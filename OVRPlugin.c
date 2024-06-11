@@ -227,7 +227,7 @@ bool ovrp_RecenterTrackingOrigin(uint flags) {
     return 0;
 }
 bool ovrp_GetInitialized() {
-    LogFunction(IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, FREQUENT, __func__);
 
     return Pxr_IsInitialized();
 }
@@ -242,12 +242,12 @@ intptr_t ovrp_GetNativeSDKVersion() {
     return ((intptr_t)OVRP_VERSION);
 }
 intptr_t ovrp_GetAudioOutId() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
     
     return 0;
 }
 intptr_t ovrp_GetAudioInId() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
     
     return 0;
 }
@@ -292,8 +292,8 @@ bool ovrp_SetTrackingPositionEnabled(bool value) {
     return 0;
 }
 bool ovrp_GetNodePresent(Node nodeId) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
     return 1;
 }
 bool ovrp_GetNodeOrientationTracked(Node nodeId) {
@@ -447,7 +447,7 @@ bool ovrp_ShowSystemUI(PlatformUI ui) {
     return 0;
 }
 bool ovrp_GetAppMonoscopic() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
     
     return 0;
 }
@@ -587,7 +587,7 @@ float ovrp_GetAppCpuStartToGpuEndTime() {
     return 0;
 }
 int ovrp_GetSystemRecommendedMSAALevel() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
     
     return 0;
 }
@@ -1012,7 +1012,7 @@ Result ovrp_GetHandNodePoseStateLatency(double *latencyInSeconds) {
 }
 Result ovrp_GetAppHasInputFocus(bool *appHasInputFocus) {
     *appHasInputFocus = 1;
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
     
     return 0;
 }
@@ -1297,7 +1297,7 @@ Result ovrp_GetNodeOrientationValid(Node nodeId, bool *nodeOrientationValid) {
 Result ovrp_GetNodePositionValid(Node nodeId, bool *nodePositionValid) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    //*nodePositionValid = 1;
+    *nodePositionValid = 1;
     return 0;
 }
 Result ovrp_GetAdaptiveGpuPerformanceScale2(float *adaptiveGpuPerformanceScale) {
