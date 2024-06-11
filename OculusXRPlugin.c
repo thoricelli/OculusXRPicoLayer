@@ -6,13 +6,19 @@
 #include <android/log.h>
 
 #include "OculusXRPlugin.h"
+
+//PXR
 #include "/include/PxrPlatform.h"
 #include "/include/PxrPlugin.h"
+
 #include "/include/Globals.h"
+#include "/src/include/Logger.h"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 
 void SetColorScale(float x, float y, float z, float w) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     s_ColorScale.x = x;
     s_ColorScale.y = y;
     s_ColorScale.z = z;
@@ -22,6 +28,8 @@ void SetColorScale(float x, float y, float z, float w) {
 ovrpVector4f s_ColorOffset = {1.0f, 1.0f, 1.0f, 1.0f};
 
 void SetColorOffset(float x, float y, float z, float w) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     s_ColorOffset.x = x;
     s_ColorOffset.y = y;
     s_ColorOffset.z = z;
@@ -29,20 +37,26 @@ void SetColorOffset(float x, float y, float z, float w) {
 }
 
 bool GetIsSupportedDevice() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return true;
 }
 
 bool LoadOVRPlugin(char *ovrpPath) {
-    
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_LoadPlugin();
 }
 
 void UnloadOVRPlugin() {
-    
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_UnloadPlugin();
 }
 
 Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
+    LogFunction(IMPLEMENTED, FREQUENT, ((char *)__func__));
+
     float f1 = sqrtf(from.x * from.x + from.y * from.y + from.z * from.z);
     float f2 = sqrtf(to.x * to.x + to.y * to.y + to.z * to.z);
     if (f1 < 1e-6f || f2 < 1e-6f) {
@@ -60,6 +74,8 @@ Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
 
 //God, theres different versions of UserDefinedSettings... :(
 void SetUserDefinedSettings(UserDefinedSettings *settings) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "Hello World! Made by thoricelli.");
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called with stereoRenderingMode: %d, colorSpace: %d, optimizeBufferDiscards: %d, spaceWarp: %d, lateLatchingDebug: %d", __func__, settings->stereoRenderingMode, settings->colorSpace, settings->optimizeBufferDiscards, settings->spaceWarp, settings->lateLatchingDebug);
 
@@ -83,133 +99,195 @@ void SetUserDefinedSettings(UserDefinedSettings *settings) {
 
 //This would have been handy PICO...
 int SetCPULevel(int cpuLevel) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return cpuLevel;
 }
 
 int SetGPULevel(int gpuLevel) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return gpuLevel;
 }
 
 void GetOVRPVersion(char* version) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     version = OVRP_VERSION;
     return;
 }
 
 void EnablePerfMetrics(bool enable) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return;
 }
 
 void EnableAppMetrics(bool enable) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return;
 }
 
 bool SetDeveloperModeStrict(bool active) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return true;
 }
 
 bool GetAppHasInputFocus() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__)); //Still have to implement it with PXR.
+
     return true;
 }
 
 bool GetBoundaryConfigured() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_GetBoundaryConfigured();
 }
 
-//bool GetBoundaryDimensions(Boundary.BoundaryType boundaryType, Vector3 dimensions) {
-
 bool GetBoundaryDimensions(void* boundaryType, void* dimensions) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_GetBoundaryDimensions(true, dimensions);
 }
 
 bool GetBoundaryVisible() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_GetBoundaryVisible();
 }
 
 void SetBoundaryVisible(bool boundaryVisible) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     Pxr_SetBoundaryVisible(boundaryVisible);
 }
 
 bool GetAppShouldQuit() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetDisplayAvailableFrequencies(uint32_t *ptr, float *numFrequencies) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_GetDisplayRefreshRatesAvailable(ptr, &numFrequencies);
 }
 
 bool SetDisplayFrequency(float refreshRate) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_SetDisplayRefreshRate(refreshRate);
 }
 
 bool GetDisplayFrequency(float refreshRate) {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return Pxr_GetConfigFloat(PXR_GET_DISPLAY_RATE, &refreshRate);
 }
 
 enum SystemHeadset GetSystemHeadsetType() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     //I mean, something like that, right?
     return Meta_Quest_3;
 }
 
 bool GetTiledMultiResSupported() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return true;
 }
 
 void SetTiledMultiResLevel(int level) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return;
 }
 
 int GetTiledMultiResLevel() {
+    LogFunction(IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return 1;
 }
 
 void SetTiledMultiResDynamic(bool isDynamic) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return;
 }
 
 bool GetEyeTrackedFoveatedRenderingSupported() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetEyeTrackedFoveatedRenderingEnabled() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 void SetEyeTrackedFoveatedRenderingEnabled(bool isEnabled) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return;
 }
 
 bool GetShouldRestartSession() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool SetupEnvironmentDepth(EnvironmentDepthCreateParamsInternal* createParams) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool SetEnvironmentDepthRendering(bool isEnabled) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool ShutdownEnvironmentDepth() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetEnvironmentDepthTextureId(uint id) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetEnvironmentDepthFrameDesc(EnvironmentDepthFrameDescInternal* frameDesc, int eye) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool SetEnvironmentDepthHandRemoval(bool isEnabled) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetEnvironmentDepthSupported() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
 
 bool GetEnvironmentDepthHandRemovalSupported() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, ((char *)__func__));
+
     return false;
 }
