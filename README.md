@@ -23,7 +23,7 @@ Don't forget to add the toolchain /bin/ to your path! <br>
 | :---:   | :---: | :---: |
 | Keep Talking and Nobody Explodes | Fully functional | / |
 | Waltz of the Wizard | Sound | No video |
-| Job Simulator | Video | Audio glitches <br/> Controllers |
+| Job Simulator | Video <br> Controllers (No touch) | Audio glitches <br> Physics glitches |
 
 More games are to be tested soon.
 
