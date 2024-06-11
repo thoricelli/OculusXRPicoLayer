@@ -8,4 +8,4 @@ typedef enum LogFunctionType_ {
     IMPLEMENTED //A function that is already fully implemented
 } LogFunctionType;
 
-void LogFunction(LogFunctionType type, CallFrequency frequency, char* func);
+void LogFunction(LogFunctionType type, CallFrequency frequency, const char func[]);

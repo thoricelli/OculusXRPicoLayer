@@ -3,7 +3,7 @@
 #include "../include/Globals.h"
 
 //Logs that the function had been called.
-void LogFunction(LogFunctionType type, CallFrequency frequency, char* func) {
+void LogFunction(LogFunctionType type, CallFrequency frequency, const char func[]) {
     #if VERBOSE
         #if VERBOSITY_FUNCTIONS > 0 && !FUNCTIONS_ALLOW_SPAM
         if (type == IMPLEMENTED && frequency == NORMAL)
