@@ -12,7 +12,9 @@ Currently not yet finished. <br>
 Feel free to contribute with a PR!
 
 # Building
-- Install the Android NDK: https://developer.android.com/ndk/downloads <br>
+- Install the Android NDK <br>
+<b>Required version:</b> r21e (21.4.7075529).
+<br>https://developer.android.com/ndk/downloads <br>
 (I recommend you install it via Android Studio)
 - Run either the `compile_windows.ps1` powershell script or the `compile_linux.bash` bash script. <br>
 Don't forget to add the toolchain /bin/ to your path! <br>
