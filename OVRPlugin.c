@@ -9,15 +9,15 @@
 #include "OculusXRPlugin.h"
 
 //PXR
-#include "/include/PxrPlugin.h"
-#include "/include/PxrInput.h"
-#include "/include/PxrPlatform.h"
-#include "/include/PxrPlatformLoader.h"
+#include "include/PxrPlugin.h"
+#include "include/PxrInput.h"
+#include "include/PxrPlatform.h"
+#include "include/PxrPlatformLoader.h"
 
-#include "/include/Globals.h"
-#include "/src/PxrUnityPluginLoader.c"
-#include "/src/PxrToOculusMapper.c"
-#include "/src/Logger.c"
+#include "include/Globals.h"
+#include "src/PxrUnityPluginLoader.c"
+#include "src/PxrToOculusMapper.c"
+#include "src/Logger.c"
 
 /* LEGACY (TODO) */
 bool ovrp_PreInitialize() {
@@ -332,39 +332,94 @@ int getConnectedControllers() {
     return connectedControllers;
 }
 
-uint getButtonsFromState(PxrControllerInputState pxrState, uint shift) {
+//Move to mapper maybe?
+uint getButtonsFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
     uint state = 0;
-    state |= pxrState.AXValue * Button_One << shift;
-    state |= pxrState.BYValue * Button_Two << shift;
+    switch (controllerType) {
+        case PXR_CONTROLLER_RIGHT:
+            state |= pxrState.AXValue * RawButton_A;
+            state |= pxrState.BYValue * RawButton_B;
+
+            state |= pxrState.triggerclickValue * RawButton_RIndexTrigger;
+            state |= pxrState.sideValue * RawButton_RHandTrigger;
+            break;
+        case PXR_CONTROLLER_LEFT:
+            state |= pxrState.AXValue * RawButton_X;
+            state |= pxrState.BYValue * RawButton_Y;
+
+            //What is the LShoulder?
+            state |= pxrState.triggerclickValue * RawButton_LIndexTrigger;
+            state |= pxrState.sideValue * RawButton_LHandTrigger;
+            break;
+        default:
+            break;
+    }
+
+    //The same for both controllers
+    state |= pxrState.homeValue * RawButton_Start;
+    state |= pxrState.backValue * RawButton_Back;
+
+    return state;
+}
+
+uint getTouchFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
+    uint state = 0;
+    switch (controllerType) {
+        case PXR_CONTROLLER_RIGHT:
+            state |= pxrState.AXTouchValue * RawButton_A;
+            state |= pxrState.BYTouchValue * RawButton_B;
+
+            state |= pxrState.triggerclickValue * RawButton_RIndexTrigger;
+            state |= pxrState.rockerTouchValue * RawButton_RHandTrigger;
+
+            state |= pxrState.thumbrestTouchValue * RawButton_RThumbstick;
+            break;
+        case PXR_CONTROLLER_LEFT:
+            state |= pxrState.AXTouchValue * RawButton_X;
+            state |= pxrState.BYTouchValue * RawButton_Y;
+
+            state |= pxrState.triggerTouchValue * RawButton_LIndexTrigger;
+            state |= pxrState.rockerTouchValue * RawButton_LHandTrigger;
+
+            state |= pxrState.thumbrestTouchValue * RawButton_LThumbstick;
+            break;
+        default:
+            break;
+    }
+
     return state;
 }
 
 //Refer to Controller enum.
-ControllerState getControllerState(uint controllerMask) {
+ControllerState6 getControllerState(uint controllerMask) {
 
     PxrControllerInputState controllerState;
-    ControllerState state;
-
-    state.Buttons = 0;
+    ControllerState6 state = { 0 };
 
     if (controllerMask & LTouch) {
         Pxr_GetControllerInputState(PXR_CONTROLLER_LEFT, &controllerState);
 
-        state.Buttons |= getButtonsFromState(controllerState, LeftController_Start);
+        state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_LEFT);
+        state.Touches |= getTouchFromState(controllerState, PXR_CONTROLLER_LEFT);
 
         state.LIndexTrigger = controllerState.triggerValue;
         state.LHandTrigger = controllerState.gripValue;
         state.LThumbstick = *((Vector2f*)&controllerState.Joystick);
+
+        state.LIndexTriggerSlide = controllerState.triggerValue;
     }
 
     if (controllerMask & RTouch) {
         Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerState);
 
-        state.Buttons |= getButtonsFromState(controllerState, RightController_Start);
+        state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_RIGHT);
+        state.Touches |= getTouchFromState(controllerState, PXR_CONTROLLER_RIGHT);
 
         state.RIndexTrigger = controllerState.triggerValue;
         state.RHandTrigger = controllerState.gripValue;
         state.RThumbstick = *((Vector2f*)&controllerState.Joystick);
+
+        state.RIndexTriggerSlide = controllerState.triggerValue;
     }
 
     state.ConnectedControllers = getConnectedControllers();
@@ -374,7 +429,8 @@ ControllerState getControllerState(uint controllerMask) {
 ControllerState ovrp_GetControllerState(uint controllerMask) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    return getControllerState(controllerMask);
+    ControllerState6 state6 = getControllerState(controllerMask);
+    return *((ControllerState*)&state6);
 }
 
 // Deprecated. Replaced by ovrp_GetSuggestedCpuPerformanceLevel
@@ -720,8 +776,8 @@ PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
 ControllerState2 ovrp_GetControllerState2(uint controllerMask) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    ControllerState state = getControllerState(controllerMask);
-    ControllerState2 base = *((ControllerState2*)&state);
+    ControllerState6 state6 = getControllerState(controllerMask);
+    ControllerState2 base = *((ControllerState2*)&state6);
     //Add more.
     return base;
 }
@@ -932,8 +988,8 @@ Result ovrp_GetCameraDeviceColorFrameBgraPixels(CameraDevice cameraDevice, intpt
 Result ovrp_GetControllerState4(uint controllerMask, ControllerState4 *controllerState) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    ControllerState state = getControllerState(controllerMask);
-    *controllerState = *((ControllerState4*)&state);
+    ControllerState6 state6 = getControllerState(controllerMask);
+    *controllerState = *((ControllerState4*)&state6);
     return 0;
 }
 
@@ -1295,7 +1351,7 @@ Result ovrp_GetNodeOrientationValid(Node nodeId, bool *nodeOrientationValid) {
     return 0;
 }
 Result ovrp_GetNodePositionValid(Node nodeId, bool *nodePositionValid) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__); //Technically not implemented yet
     
     *nodePositionValid = 1;
     return 0;
@@ -1494,7 +1550,7 @@ Result ovrp_GetSkeleton2(SkeletonType skeletonType, Skeleton2Internal *skeleton)
 }
 Result ovrp_PollEvent(EventDataBuffer *eventDataBuffer) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+
     return 0;
 }
 Result ovrp_GetNativeXrApiType(XrApi *xrApi) {
@@ -2019,7 +2075,7 @@ Result ovrp_GetEyeGazesState(Step stepId, int frameIndex, EyeGazesStateInternal 
 Result ovrp_GetControllerState5(uint controllerMask, ControllerState5 *controllerState) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    ControllerState state = getControllerState(controllerMask);
+    ControllerState6 state = getControllerState(controllerMask);
     *controllerState = *((ControllerState5*)&state);
     return 0;
 }
@@ -2111,7 +2167,7 @@ Result ovrp_GetSpaceTriangleMesh(uint64_t *space, TriangleMeshInternal *triangle
 Result ovrp_GetControllerState6(uint controllerMask, ControllerState6 *controllerState) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    ControllerState state = getControllerState(controllerMask);
+    ControllerState6 state = getControllerState(controllerMask);
     *controllerState = *((ControllerState6*)&state);
     return 0;
 }

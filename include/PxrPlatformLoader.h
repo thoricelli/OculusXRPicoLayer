@@ -15,3 +15,10 @@ typedef uint64_t ppfRequest;
 
 extern ppfPlatformInitializeResult ppf_UnityInitWrapper(const char *appId);
 extern ppfRequest ppf_UnityInitAsynchronousWrapper(const char *appId);
+
+/// @brief Synchronously Initialize Platform SDK from Android application.
+///
+/// @param  appId The application ID get from developer dashboard.
+/// @return The initialize result.
+///
+ppfPlatformInitializeResult ppf_InitializeAndroid(const char *appId, jobject applicationObject, JNIEnv *env);

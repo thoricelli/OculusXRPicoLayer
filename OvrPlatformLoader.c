@@ -8,15 +8,30 @@
 #include "OvrPlatformLoader.h"
 
 //PXR
-#include "/include/PxrPlugin.h"
-#include "/include/PxrApi.h"
-#include "/include/PxrPlatformLoader.h"
+#include "include/PxrPlugin.h"
+#include "include/PxrApi.h"
+#include "include/PxrPlatformLoader.h"
 
-#include "/include/Globals.h"
-#include "/src/Logger.c"
+#include "include/Globals.h"
+#include "src/Logger.c"
 
 // Initialization
 intptr_t lastMessage = 0x0; //For the FreeMessage function.
+
+bool ovr_IsPlatformInitialized() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 1;
+}
+ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, jobject activityObject, JNIEnv * jni) {
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    Pxr_SetGraphicOption(PXR_VULKAN);
+    Pxr_Initialize();
+
+    ppfPlatformInitializeResult result = ppf_InitializeAndroid(0, activityObject, jni);
+    return 0;//*((ovrPlatformInitializeResult*)&result);
+}
 
 bool ovr_UnityInitWrapper(char *appId) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -77,6 +92,59 @@ unsigned long ovr_UnityInitWrapperWindowsAsynchronous(char *appId, intptr_t logg
 
 bool ovr_SetDeveloperAccessToken(char *accessToken) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    return true;
+}
+ovrID ovr_GetLoggedInUserID() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+
+/// Helper function for making an int ovrKeyValuePair.
+///
+/// For example, ovrKeyValuePair_makeInt("key", 1);
+ovrKeyValuePair ovrKeyValuePair_makeInt(const char *key, int value) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    ovrKeyValuePair dummy;
+    return dummy;
+}
+
+/// Helper function for making a double ovrKeyValuePair.
+///
+/// For example, ovrKeyValuePair_makeDouble("key", 1.1);
+ovrKeyValuePair ovrKeyValuePair_makeDouble(const char *key, double value) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    ovrKeyValuePair dummy;
+    return dummy;
+}
+
+/// Helper function for making a string ovrKeyValuePair.
+///
+/// For example, ovrKeyValuePair_makeString("key", "value");
+ovrKeyValuePair ovrKeyValuePair_makeString(const char *key, const char *value) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    ovrKeyValuePair dummy;
+    return dummy;
+}
+/// Convert a string into an ovrID.  Returns false if the input is
+/// malformed (either out of range, or not an integer).
+bool ovrID_FromString(ovrID *outId, const char* inId) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return true;
+}
+/// Convert an ID back into a string.  This function round trips with
+/// ovrID_FromString().  Note: the id format may change in the future.
+/// Developers should not rely on the string representation being an
+/// integer.
+///
+/// Length of outParam should be > 20.
+bool ovrID_ToString(char *outParam, size_t bufferLength, ovrID id) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
     return true;
 }
@@ -677,6 +745,20 @@ unsigned long ovr_CloudStorage_Delete(intptr_t bucket, intptr_t key) {
     
     return 0;
 }
+/// Get the next page of entries
+///
+/// A message with type ::ovrMessage_CloudStorage_GetNextCloudStorageMetadataArrayPage will be generated in response.
+///
+/// First call ::ovr_Message_IsError() to check if an error occurred.
+///
+/// If no error occurred, the message will contain a payload of type ::ovrCloudStorageMetadataArrayHandle.
+/// Extract the payload from the message handle with ::ovr_Message_GetCloudStorageMetadataArray().
+ovrRequest ovr_CloudStorage_GetNextCloudStorageMetadataArrayPage(ovrCloudStorageMetadataArrayHandle handle) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+
 unsigned long ovr_CloudStorage_Load(intptr_t bucket, intptr_t key) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
@@ -1337,6 +1419,16 @@ unsigned long ovr_User_GetLoggedInUserFriendsAndRooms() {
 unsigned long ovr_User_GetLoggedInUserRecentlyMetUsersAndRooms(intptr_t userOptions) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
+    return 0;
+}
+unsigned long ovr_User_GetNextUserAndRoomArrayPage(ovrUserAndRoomArrayHandle *handle) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+unsigned long ovr_User_GetNextUserArrayPage(ovrUserArrayHandle *handle) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
     return 0;
 }
 unsigned long ovr_User_GetOrgScopedID(uint64_t userID) {

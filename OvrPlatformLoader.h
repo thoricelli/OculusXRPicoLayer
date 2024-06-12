@@ -719,4 +719,33 @@ typedef enum AccountAgeCategory_
     Ad,
 } AccountAgeCategory;
 
+
+typedef struct ovrUserAndRoomArrayHandle_
+{} ovrUserAndRoomArrayHandle;
+
+typedef struct ovrUserArrayHandle_
+{} ovrUserArrayHandle;
+
+typedef struct ovrCloudStorageMetadataArrayHandle_
+{} ovrCloudStorageMetadataArrayHandle;
+
+/// A unique identifier for some entity in the system (user, room, etc).
+///
+typedef uint64_t ovrID;
+typedef uint64_t ovrRequest;
+
+typedef enum ovrPlatformInitializeResult2_ {
+    ovrPlatformInitializeResult__Success = 0,
+    ovrPlatformInitializeResult__Uninitialized = -1,
+    ovrPlatformInitializeResult__PreLoaded = -2,
+    ovrPlatformInitializeResult__FileInvalid = -3,
+    ovrPlatformInitializeResult__SignatureInvalid = -4,
+    ovrPlatformInitializeResult__UnableToVerify = -5,
+    ovrPlatformInitializeResult__VersionMismatch = -6,
+    ovrPlatformInitializeResult__Unknown = -7,
+    ovrPlatformInitializeResult__InvalidCredentials = -8,
+    ovrPlatformInitializeResult_ovrPlatformInitialize_NotEntitled = -9,
+} ovrPlatformInitializeResult;
+
+
 #endif

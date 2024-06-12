@@ -1,0 +1,25 @@
+name: Builds the Oculus libs with the Android NDK.
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r21e
+      - run: |
+          chmod +x ./compile_linux.sh
+          ./compile_linux.sh
+        shell: bash
+        env:
+          NDK_CLANG: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            ./out/*.so
+            libPxrPlatform.so
+            libpxr_api.so
+            libpxrplatformloader.so

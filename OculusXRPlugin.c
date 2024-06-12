@@ -8,11 +8,11 @@
 #include "OculusXRPlugin.h"
 
 //PXR
-#include "/include/PxrPlatform.h"
-#include "/include/PxrPlugin.h"
+#include "include/PxrPlatform.h"
+#include "include/PxrPlugin.h"
 
-#include "/include/Globals.h"
-#include "/src/Logger.c"
+#include "include/Globals.h"
+#include "src/Logger.c"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 
