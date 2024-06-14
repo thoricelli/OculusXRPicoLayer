@@ -55,8 +55,6 @@ void UnloadOVRPlugin() {
 }
 
 Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
-    LogFunction(IMPLEMENTED, FREQUENT, __func__);
-
     float f1 = sqrtf(from.x * from.x + from.y * from.y + from.z * from.z);
     float f2 = sqrtf(to.x * to.x + to.y * to.y + to.z * to.z);
     if (f1 < 1e-6f || f2 < 1e-6f) {

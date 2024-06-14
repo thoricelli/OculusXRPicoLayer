@@ -27,8 +27,8 @@ bool ovrp_PreInitialize() {
 }
 bool ovrp_Initialize(RenderAPIType apiType, intptr_t platformArgs) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
-    
-    Pxr_SetGraphicOption(PXR_OPENGL_ES);
+
+    Pxr_SetConfigInt(PXR_UNREAL_OPENGL_NOERROR, 1);
     return Pxr_Initialize();
 }
 bool ovrp_Shutdown() {
@@ -58,8 +58,8 @@ bool ovrp_SetEyeTexture(Eye eyeId, intptr_t texture) {
 }
 bool ovrp_Update(int frameIndex) {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
-    
-    return Pxr_WaitFrame();
+
+    return 0;
 }
 bool ovrp_BeginFrame(int frameIndex) {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
@@ -208,18 +208,26 @@ Posef ovrp_GetNodeAcceleration(Node nodeId) {
 TrackingOrigin ovrp_GetTrackingOriginType() {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    PxrTrackingOrigin pxrTrackingOriginDummy;
-    //Doesn't actually use the argument?
-    return (TrackingOrigin)Pxr_GetTrackingOrigin(&pxrTrackingOriginDummy);
+    PxrTrackingOrigin pxrTrackingOrigin;
+    Pxr_GetTrackingOrigin(&pxrTrackingOrigin);
+
+    return (TrackingOrigin)pxrTrackingOrigin;
 }
 bool ovrp_SetTrackingOriginType(TrackingOrigin originType) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
-    return Pxr_SetTrackingOrigin((PxrTrackingOrigin) originType);
+
+    return 0;//Pxr_SetTrackingOrigin((PxrTrackingOrigin) originType);
 }
 Posef ovrp_GetTrackingCalibratedOrigin() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    Posef posefDummy;
-    return posefDummy;
+
+    float calibratedHeight;
+    Pxr_GetConfigFloat(PXR_TRACKING_ORIGIN_HEIGHT, &calibratedHeight);
+
+    Posef origin = {
+            .Position.y = calibratedHeight,
+    };
+    return origin;
 }
 bool ovrp_RecenterTrackingOrigin(uint flags) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -274,7 +282,7 @@ bool ovrp_GetTrackingOrientationEnabled() {
 bool ovrp_SetTrackingOrientationEnabled(bool value) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return 1;
 }
 bool ovrp_GetTrackingPositionSupported() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -289,7 +297,7 @@ bool ovrp_GetTrackingPositionEnabled() {
 bool ovrp_SetTrackingPositionEnabled(bool value) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return 1;
 }
 bool ovrp_GetNodePresent(Node nodeId) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
@@ -406,7 +414,7 @@ ControllerState6 getControllerState(uint controllerMask) {
         state.LHandTrigger = controllerState.gripValue;
         state.LThumbstick = *((Vector2f*)&controllerState.Joystick);
 
-        state.LIndexTriggerSlide = controllerState.triggerValue;
+        //state.LIndexTriggerSlide = controllerState.triggerValue;
     }
 
     if (controllerMask & RTouch) {
@@ -419,7 +427,7 @@ ControllerState6 getControllerState(uint controllerMask) {
         state.RHandTrigger = controllerState.gripValue;
         state.RThumbstick = *((Vector2f*)&controllerState.Joystick);
 
-        state.RIndexTriggerSlide = controllerState.triggerValue;
+        //state.RIndexTriggerSlide = controllerState.triggerValue;
     }
 
     state.ConnectedControllers = getConnectedControllers();
@@ -435,27 +443,33 @@ ControllerState ovrp_GetControllerState(uint controllerMask) {
 
 // Deprecated. Replaced by ovrp_GetSuggestedCpuPerformanceLevel
 int ovrp_GetSystemCpuLevel() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
-    return 0;
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    int level;
+    Pxr_GetPerformanceLevels(PXR_PERF_SETTINGS_CPU, &level);
+
+    return level;
 }
 //Deprecated. Replaced by ovrp_SetSuggestedCpuPerformanceLevel
 bool ovrp_SetSystemCpuLevel(int value) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return Pxr_SetPerformanceLevels(PXR_PERF_SETTINGS_CPU, value);
 }
 //Deprecated. Replaced by ovrp_GetSuggestedGpuPerformanceLevel
 int ovrp_GetSystemGpuLevel() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
-    return 0;
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    int level;
+    Pxr_GetPerformanceLevels(PXR_PERF_SETTINGS_GPU, &level);
+
+    return level;
 }
 //Deprecated. Replaced by ovrp_SetSuggestedGpuPerformanceLevel
 bool ovrp_SetSystemGpuLevel(int value) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return Pxr_SetPerformanceLevels(PXR_PERF_SETTINGS_GPU, value);
 }
 bool ovrp_GetSystemPowerSavingMode() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -523,9 +537,9 @@ bool ovrp_GetAppShouldQuit() {
     return 0;
 }
 bool ovrp_GetAppShouldRecenter() {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
-    return 0;
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    return false;
 }
 intptr_t ovrp_GetAppLatencyTimings() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -644,8 +658,10 @@ float ovrp_GetAppCpuStartToGpuEndTime() {
 }
 int ovrp_GetSystemRecommendedMSAALevel() {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
-    
-    return 0;
+
+    int data;
+    Pxr_GetConfigInt(PXR_MSAA_LEVEL_RECOMMENDED, &data);
+    return 0;//data;
 }
 bool ovrp_GetAppChromaticCorrection() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -702,7 +718,7 @@ bool ovrp_SetBoundaryVisible(bool value) {
 }
 bool ovrp_Update2(int stateId, int frameIndex, double predictionSeconds) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+
     return 0;
 }
 Posef ovrp_GetNodePose2(int stateId, Node nodeId) {
@@ -769,7 +785,8 @@ float ovrp_GetAppFramerate() {
     return 0;
 }
 PoseStatef ovrp_GetNodePoseState(Step stepId, Node nodeId) {
-    LogFunction(IMPLEMENTED, NORMAL, __func__);
+    //Logging this causes issues when holding objects? WTF?
+    //LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return GetNodePoseState(nodeId);
 }
@@ -922,14 +939,16 @@ Result ovrp_GetNodeFrustum2(Node nodeId, Frustumf2 *nodeFrustum) {
     float fovLeft, fovRight, fovUp, fovDown;
 
     if (nodeId <= 2) {
-        Pxr_GetFov(*((PxrEyeType*)&nodeId), &fovLeft, &fovRight, &fovUp, &fovDown);
         Pxr_GetFrustum(*((PxrEyeType*)&nodeId), &left, &right, &top, &bottom, &near, &far);
     }
 
     Frustumf2 frustumf = {
             .zNear = near,
             .zFar = far,
-            .Fov = fovUp,
+            .Fov.UpTan = top,
+            .Fov.DownTan = bottom,
+            .Fov.LeftTan = left,
+            .Fov.RightTan = right,
     };
 
     *nodeFrustum = frustumf;
@@ -1142,7 +1161,7 @@ Result ovrp_EnqueueSetupLayer2(LayerDesc *desc, int compositionDepth, int *layer
                 .layerShape = PXRConvertToOverLayShape(desc->Shape),
                 .layerType = PXR_OVERLAY,
                 .layerLayout = PXRConvertToLayerLayout(desc->Layout),
-                .format = 0x8058,//*((int*)&desc->Format),
+                .format = *((int*)&desc->Format),
                 .width = desc->TextureSize.w,
                 .height = desc->TextureSize.h,
                 .sampleCount = desc->SampleCount,
@@ -1176,7 +1195,6 @@ Result ovrp_GetHeadPoseModifier(Quatf *relativeRotation, Vector3f *relativeTrans
     return 0;
 }
 Result ovrp_GetNodePoseStateRaw(Step stepId, int frameIndex, Node nodeId, PoseStatef *nodePoseState) {
-    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "%s called! But not implemented!", __func__);
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
     return 0;
@@ -1565,7 +1583,7 @@ Result ovrp_GetNativeOpenXRHandles(uint64_t *xrInstance, uint64_t *xrSession) {
 }
 Result ovrp_PollEvent2(EventType *eventType, intptr_t *eventData) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+
     return 0;
 }
 Result ovrp_Media_GetPlatformCameraMode(PlatformCameraMode *platformCameraMode) {
@@ -2168,7 +2186,7 @@ Result ovrp_GetControllerState6(uint controllerMask, ControllerState6 *controlle
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     ControllerState6 state = getControllerState(controllerMask);
-    *controllerState = *((ControllerState6*)&state);
+    *controllerState = state;
     return 0;
 }
 Result ovrp_GetVirtualKeyboardModelAnimationStates(VirtualKeyboardModelAnimationStatesInternal *animationStates) {

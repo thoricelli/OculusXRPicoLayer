@@ -13,23 +13,27 @@ typedef enum LogFunctionType_ {
 
 //Logs that the function had been called.
 void LogFunction(LogFunctionType type, CallFrequency frequency, const char func[]) {
-    #if VERBOSE
-        #if VERBOSITY_FUNCTIONS >= 0
-        if (type == IMPLEMENTED && frequency == NORMAL)
-            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED] %s called.", func);
-        #endif
-        #if VERBOSITY_FUNCTIONS <= 0
-        if (type == NON_IMPLEMENTED && frequency == NORMAL)
-            __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED] %s called.", func);
-        #endif
 
-        #if VERBOSITY_FUNCTIONS >= 0 && FUNCTIONS_ALLOW_SPAM
-            if (type == IMPLEMENTED && frequency == FREQUENT)
-                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED, SPAM] %s called.", func);
+    //Logging causes physics to break?
+    #if VERBOSE
+    if (type == IMPLEMENTED) {
+        #if VERBOSITY_FUNCTIONS >= 0
+            if (frequency == NORMAL)
+                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED] %s called.", func);
+            #if FUNCTIONS_ALLOW_SPAM
+                else
+                    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[IMPLEMENTED, SPAM] %s called.", func);
+            #endif
         #endif
-        #if VERBOSITY_FUNCTIONS <= 0 && FUNCTIONS_ALLOW_SPAM
-            if (type == NON_IMPLEMENTED && frequency == FREQUENT)
-                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED, SPAM] %s called.", func);
+    } else if (type == NON_IMPLEMENTED) {
+        #if VERBOSITY_FUNCTIONS <= 0
+            if (frequency == NORMAL)
+                __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED] %s called.", func);
+            #if FUNCTIONS_ALLOW_SPAM
+                else
+                    __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "[NOT IMPLEMENTED, SPAM] %s called.", func);
+            #endif
         #endif
+    }
     #endif
 }
