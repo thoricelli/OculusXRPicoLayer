@@ -42,6 +42,16 @@ Quatf PxrPosefToOVRQuatf(PxrPosef posef) {
     return *((Quatf*)&posef.orientation);
 }
 
+//Because OVR's measurement is in m/s and PICO's is cm/s... ok...
+Vector3f PxrVector3ToOVRVector3(PxrVector3f vector3F) {
+    Vector3f ovrVector3  = {
+            .x = vector3F.x / 100,
+            .y = vector3F.y / 100,
+            .z = vector3F.z / 100,
+    };
+    return ovrVector3;
+}
+
 Posef PxrPosefFlipped(PxrPosef posef) {
     Posef flipped = *((Posef*)&posef);
 

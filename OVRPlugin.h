@@ -24,7 +24,7 @@ typedef enum Eye_
 
 typedef enum Node_
 {
-    none = -1,
+    Node_None = -1,
     EyeLeft = 0,
     EyeRight = 1,
     EyeCenter = 2,
@@ -37,7 +37,9 @@ typedef enum Node_
     Head = 9,
     DeviceObjectZero = 10,
     TrackedKeyboard = 11,
-    Node_count,
+    ControllerLeft = 12,
+    ControllerRight = 13,
+    Node_Count,
 } Node;
 
 typedef enum TrackingOrigin_
@@ -99,10 +101,10 @@ typedef enum RawButton_
 
 typedef struct ControllerState_
 {
-    uint ConnectedControllers;
-    uint Buttons;
-    uint Touches;
-    uint NearTouches;
+    uint32_t ConnectedControllers;
+    uint32_t Buttons;
+    uint32_t Touches;
+    uint32_t NearTouches;
     float LIndexTrigger;
     float RIndexTrigger;
     float LHandTrigger;
@@ -188,6 +190,11 @@ typedef enum Controller_
     LHand = 0x00000020,
     RHand = 0x00000040,
     Hands = LHand | RHand,
+
+    LTrackedRemote     = 0x01000000,
+    RTrackedRemote     = 0x02000000,
+    Touchpad           = 0x08000000,
+
     Active = 0x80000000,
     All = ~Controller_None,
 } Controller;
@@ -248,10 +255,10 @@ typedef enum Step_
 } Step;
 
 typedef struct ControllerState2_ {
-    uint ConnectedControllers;
-    uint Buttons;
-    uint Touches;
-    uint NearTouches;
+    uint32_t ConnectedControllers;
+    uint32_t Buttons;
+    uint32_t Touches;
+    uint32_t NearTouches;
     float LIndexTrigger;
     float RIndexTrigger;
     float LHandTrigger;
@@ -389,10 +396,10 @@ typedef enum CameraDevice_
 } CameraDevice;
 
 typedef struct ControllerState4 {
-    uint ConnectedControllers;
-    uint Buttons;
-    uint Touches;
-    uint NearTouches;
+    uint32_t ConnectedControllers;
+    uint32_t Buttons;
+    uint32_t Touches;
+    uint32_t NearTouches;
     float LIndexTrigger;
     float RIndexTrigger;
     float LHandTrigger;
@@ -1393,10 +1400,10 @@ typedef struct EyeGazesStateInternal_
 
 typedef struct ControllerState5_
 {
-    uint64_t ConnectedControllers;
-    uint64_t Buttons;
-    uint64_t Touches;
-    uint64_t NearTouches;
+    uint32_t ConnectedControllers;
+    uint32_t Buttons;
+    uint32_t Touches;
+    uint32_t NearTouches;
     float LIndexTrigger;
     float RIndexTrigger;
     float LHandTrigger;

@@ -104,15 +104,18 @@ bool ovrp_SetOverlayQuad2(bool onTop, bool headLocked, intptr_t texture, intptr_
 
 PoseStatef getPosefStateForController(int deviceID) {
     PxrControllerTracking tracking;
-    float *headSensorData;
+    float headSensorData[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
-    Pxr_GetHeadSensorData(headSensorData);
     Pxr_GetControllerTrackingState(deviceID, 0, headSensorData, &tracking);
 
     PoseStatef poseStatef = {
             .Pose = *((Posef*)&tracking.localControllerPose.pose),
-            .Velocity = *((Vector3f*)&tracking.localControllerPose.linearVelocity),
-            .Acceleration = *((Vector3f*)&tracking.localControllerPose.linearAcceleration),
+
+            //cm/s -> m/s
+            .Velocity = PxrVector3ToOVRVector3(tracking.localControllerPose.linearVelocity),
+            //cm/s² -> m/s²
+            .Acceleration = PxrVector3ToOVRVector3(tracking.localControllerPose.linearAcceleration),
+
             .AngularVelocity = *((Vector3f*)&tracking.localControllerPose.angularVelocity),
             .AngularAcceleration = *((Vector3f*)&tracking.localControllerPose.angularAcceleration),
     };
@@ -159,6 +162,9 @@ Posef GetNodePose(Node nodeId) {
         case HandLeft:
         case HandRight:
             return getPosefForController(nodeId - 3);
+        case ControllerLeft:
+        case ControllerRight:
+            return getPosefForController(nodeId - 12);
         default:
             return poseStateDummy;
             break;
@@ -172,10 +178,12 @@ PoseStatef GetNodePoseState(Node nodeId) {
         case EyeCenter:
         case Head:
             return getPosefStateForSensor();
-            break;
         case HandLeft:
         case HandRight:
             return getPosefStateForController(nodeId - 3);
+        case ControllerLeft:
+        case ControllerRight:
+            return getPosefStateForController(nodeId - 12);
         default:
             return poseStateDummy;
             break;
@@ -309,11 +317,6 @@ bool ovrp_GetNodeOrientationTracked(Node nodeId) {
     
     return 1;
 }
-bool ovrp_GetNodePositionTracked(Node nodeId) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
-    return 1;
-}
 Frustumf ovrp_GetNodeFrustum(Node nodeId) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
     
@@ -331,33 +334,34 @@ Frustumf ovrp_GetNodeFrustum(Node nodeId) {
     return frustumf;
 }
 
-int getConnectedControllers() {
-    int connectedControllers = 2;
+uint32_t getConnectedController(PxrControllerHandness controller) {
+    uint32_t connectedControllers = 0;
 
-    //Check controller status
-    connectedControllers -= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_LEFT);
-    connectedControllers -= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_RIGHT);
+    switch (controller) {
+        case PXR_CONTROLLER_LEFT:
+                connectedControllers |= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_LEFT) * LTouch;
+            break;
+        case PXR_CONTROLLER_RIGHT:
+                connectedControllers |= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_RIGHT) * RTouch;
+            break;
+        default:
+            break;
+    }
+
     return connectedControllers;
 }
 
 //Move to mapper maybe?
-uint getButtonsFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
-    uint state = 0;
+uint32_t getButtonsFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
+    uint32_t state = 0;
     switch (controllerType) {
         case PXR_CONTROLLER_RIGHT:
             state |= pxrState.AXValue * RawButton_A;
             state |= pxrState.BYValue * RawButton_B;
-
-            state |= pxrState.triggerclickValue * RawButton_RIndexTrigger;
-            state |= pxrState.sideValue * RawButton_RHandTrigger;
             break;
         case PXR_CONTROLLER_LEFT:
             state |= pxrState.AXValue * RawButton_X;
             state |= pxrState.BYValue * RawButton_Y;
-
-            //What is the LShoulder?
-            state |= pxrState.triggerclickValue * RawButton_LIndexTrigger;
-            state |= pxrState.sideValue * RawButton_LHandTrigger;
             break;
         default:
             break;
@@ -370,14 +374,14 @@ uint getButtonsFromState(PxrControllerInputState pxrState, PxrControllerHandness
     return state;
 }
 
-uint getTouchFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
-    uint state = 0;
+uint32_t getTouchFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
+    uint32_t state = 0;
     switch (controllerType) {
         case PXR_CONTROLLER_RIGHT:
             state |= pxrState.AXTouchValue * RawButton_A;
             state |= pxrState.BYTouchValue * RawButton_B;
 
-            state |= pxrState.triggerclickValue * RawButton_RIndexTrigger;
+            state |= pxrState.triggerTouchValue * RawButton_RIndexTrigger;
             state |= pxrState.rockerTouchValue * RawButton_RHandTrigger;
 
             state |= pxrState.thumbrestTouchValue * RawButton_RThumbstick;
@@ -397,14 +401,12 @@ uint getTouchFromState(PxrControllerInputState pxrState, PxrControllerHandness c
 
     return state;
 }
-
 //Refer to Controller enum.
 ControllerState6 getControllerState(uint controllerMask) {
-
     PxrControllerInputState controllerState;
     ControllerState6 state = { 0 };
 
-    if (controllerMask & LTouch) {
+    if ((controllerMask & LTouch) == LTouch) {
         Pxr_GetControllerInputState(PXR_CONTROLLER_LEFT, &controllerState);
 
         state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_LEFT);
@@ -414,10 +416,10 @@ ControllerState6 getControllerState(uint controllerMask) {
         state.LHandTrigger = controllerState.gripValue;
         state.LThumbstick = *((Vector2f*)&controllerState.Joystick);
 
-        //state.LIndexTriggerSlide = controllerState.triggerValue;
+        state.ConnectedControllers |= getConnectedController(PXR_CONTROLLER_LEFT);
     }
 
-    if (controllerMask & RTouch) {
+    if ((controllerMask & RTouch) == RTouch) {
         Pxr_GetControllerInputState(PXR_CONTROLLER_RIGHT, &controllerState);
 
         state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_RIGHT);
@@ -427,10 +429,8 @@ ControllerState6 getControllerState(uint controllerMask) {
         state.RHandTrigger = controllerState.gripValue;
         state.RThumbstick = *((Vector2f*)&controllerState.Joystick);
 
-        //state.RIndexTriggerSlide = controllerState.triggerValue;
+        state.ConnectedControllers |= getConnectedController(PXR_CONTROLLER_RIGHT);
     }
-
-    state.ConnectedControllers = getConnectedControllers();
     return state;
 }
 
@@ -1009,6 +1009,7 @@ Result ovrp_GetControllerState4(uint controllerMask, ControllerState4 *controlle
 
     ControllerState6 state6 = getControllerState(controllerMask);
     *controllerState = *((ControllerState4*)&state6);
+
     return 0;
 }
 
@@ -1574,7 +1575,7 @@ Result ovrp_PollEvent(EventDataBuffer *eventDataBuffer) {
 Result ovrp_GetNativeXrApiType(XrApi *xrApi) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return 1;
 }
 Result ovrp_GetNativeOpenXRHandles(uint64_t *xrInstance, uint64_t *xrSession) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2448,5 +2449,207 @@ Result ovrp_SaveSpaces(uint32_t spaceCount, uint64_t *spaces, uint64_t *requestI
 Result ovrp_EraseSpaces(uint32_t spaceCount, uint64_t *spaces, uint32_t uuidCount, Guid *uuids, uint64_t *requestId) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
+    return 0;
+}
+
+bool ovrp_Initialize5(RenderAPIType apiType, int *logCallBack, int* activity, int *OVRPInstance, int *OVRPPhysicalDevice, int *OVRPCommandQueue, int *initializeFlags) {
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    Pxr_SetGraphicOption(*(PxrGraphicOption *)&apiType);
+    return Pxr_Initialize();
+}
+Result ovrp_GetNativeSDKPointer2() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetDisplayAdapterId(void *luid) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetupDistortionWindow3(int ovrpDistortionWindowFlag) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_DestroyDistortionWindow2() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetupEyeTexture2(Eye eye, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+
+Result ovrp_DestroyEyeTexture(Eye eye, int param_2) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetEyeTextureStageCount() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetEyeTextureFlippedY(int param_1) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetEyeViewportScale(float eyeViewPortScale) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetEyeOcclusionMesh() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetEyePreviewRect(Eye eye, long param_2) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_EndEye2(Eye eye, int param_2) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetNodeOrientationTracked2(Node nodeId, bool *nodeOrientationTracked) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    *nodeOrientationTracked = true;
+    return 0;
+}
+Result ovrp_GetNodePositionTracked2(Node nodeId, bool *nodePositionTracked) {
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    /*switch (nodeId)
+    {
+    case HandLeft:
+    case HandRight:
+    case EyeCenter:
+        *nodePositionTracked = true;
+        break;
+    
+    default:
+        *nodePositionTracked = false;
+        break;
+    }*/
+    *nodePositionTracked = true;
+
+    return 0;
+}
+bool ovrp_GetNodePositionTracked(Node nodeId) {
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    bool isTracked;
+
+    ovrp_GetNodePositionTracked2(nodeId, &isTracked);
+
+    return isTracked;
+}
+bool ovrp_GetAppShouldRecreateDistortionWindow() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetAppShouldRecreateDistortionWindow2(bool *shouldRecreateDistortionWindow) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetupDisplayObjects() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetupDisplayObjects2(long eglContext, long display, long nativeWindow) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+bool ovrp_GetSystemMultiViewSupported() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetSystemMultiViewSupported2(bool *systemMultiViewSupported) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+bool ovrp_GetEyeTextureArraySupported() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetEyeTextureArraySupported2(bool *eyeTextureArraySupported) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetEyeTextureArrayEnabled(bool *setEyeTextureArrayEnabled) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetThreadPerformance() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_AutoThreadScheduling() {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetInstanceExtensionsVk(uint8_t *extensionsData, int32_t *extensionCount) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetDeviceExtensionsVk(uint8_t *extensionsData, int32_t *extensionCount) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetLayerTextureFoveation(int OVRPLayerId, int textureIndex, Eye eye, long *foveationTextures, long *foveationTextureSize) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetAppAsymmetricFov(bool appAsymmetricFovEnabled) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetDepthCompositingSupported(bool *depthSupported) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetLayerTexture2(int OVRPLayerId, int textureIndex, Eye eye, unsigned long *colorTextures, unsigned long *depthTextures) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetupLayerDepth(long param_1, int param_2, int param_3) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_GetEyeFovLayerId(long layerId) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+    return 0;
+}
+Result ovrp_SetDepthProjInfo(long param_1, long param_2, int param_3) {
+    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
     return 0;
 }

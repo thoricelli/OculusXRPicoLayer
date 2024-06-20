@@ -16,7 +16,15 @@
 #include "src/Logger.c"
 
 // Initialization
-intptr_t lastMessage = 0x0; //For the FreeMessage function.
+int queueIndex = 0;
+intptr_t lastMessage[15]; //For the FreeMessage function.
+
+void putMessageOnQueue(intptr_t message) {
+    if (queueIndex < 15) {
+        lastMessage[queueIndex] = message;
+        queueIndex++;
+    }
+}
 
 bool ovr_IsPlatformInitialized() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -25,9 +33,6 @@ bool ovr_IsPlatformInitialized() {
 }
 ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, jobject activityObject, JNIEnv * jni) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
-
-    Pxr_SetGraphicOption(PXR_VULKAN);
-    Pxr_Initialize();
 
     ppfPlatformInitializeResult result = ppf_InitializeAndroid(0, activityObject, jni);
     return 0;//*((ovrPlatformInitializeResult*)&result);
@@ -51,7 +56,7 @@ void ovr_UnityInitGlobals(intptr_t loggingCB) {
 unsigned long ovr_UnityInitWrapperAsynchronous(char *appId) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = Platform_InitializeAndroidAsynchronous;
+    putMessageOnQueue(Platform_InitializeAndroidAsynchronous);
     return Platform_InitializeAndroidAsynchronous;
 }
 bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
@@ -62,19 +67,19 @@ bool ovr_UnityInitWrapperStandalone(char *accessToken, intptr_t loggingCB) {
 unsigned long ovr_Platform_InitializeStandaloneOculus(OculusInitParams* init) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = Platform_InitializeStandaloneOculus;
+    putMessageOnQueue(Platform_InitializeStandaloneOculus);
     return Platform_InitializeStandaloneOculus;
 }
 unsigned long ovr_PlatformInitializeWithAccessToken(uint64_t appId, char *accessToken) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = Platform_InitializeWithAccessToken;
+    putMessageOnQueue(Platform_InitializeWithAccessToken);
     return Platform_InitializeWithAccessToken;
 }
 unsigned long ovr_PlatformInitializeWithAccessTokenAndOptions(uint64_t appId, char *accessToken, ovrKeyValuePair configOptions[], uintptr_t numOptions) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = Platform_InitializeWithAccessToken;
+    putMessageOnQueue(Platform_InitializeWithAccessToken);
     return Platform_InitializeWithAccessToken;
 }
 
@@ -160,13 +165,22 @@ intptr_t ovr_GetLoggedInUserLocale() {
 intptr_t ovr_PopMessage() {
     LogFunction(IMPLEMENTED, FREQUENT, __func__);
 
-    intptr_t saved = lastMessage;
-    lastMessage = 0;
+    intptr_t saved = 0;
+
+    if (queueIndex > 0) {
+        queueIndex--;
+        saved = lastMessage[queueIndex];
+
+        if (queueIndex <= 0) {
+            lastMessage[queueIndex] = 0;
+        }
+    }
+
     return saved;
 }
 void ovr_FreeMessage(intptr_t message) {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
-    
+
     return;
 }
 
@@ -522,7 +536,9 @@ unsigned long ovr_Achievements_GetAllDefinitions() {
     return 0;
 }
 unsigned long ovr_Achievements_GetAllProgress() {
-    lastMessage = Achievements_GetAllProgress;
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
+
+    putMessageOnQueue(Achievements_GetAllProgress);
     return Achievements_GetAllProgress;
 }
 unsigned long ovr_Achievements_GetDefinitionsByName(char *names, int count) {
@@ -822,7 +838,7 @@ unsigned long ovr_Colocation_ShareMap(intptr_t uuid) {
 unsigned long ovr_Entitlement_GetIsViewerEntitled() {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = ovrMessage_Entitlement_GetIsViewerEntitled;
+    putMessageOnQueue(ovrMessage_Entitlement_GetIsViewerEntitled);
     return ovrMessage_Entitlement_GetIsViewerEntitled;
 }
 unsigned long ovr_GraphAPI_Get(intptr_t url) {
@@ -1403,7 +1419,7 @@ unsigned long ovr_User_GetLinkedAccounts(intptr_t userOptions) {
 unsigned long ovr_User_GetLoggedInUser() {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    lastMessage = ovrMessage_User_GetLoggedInUser;
+    putMessageOnQueue(ovrMessage_User_GetLoggedInUser);
     return ovrMessage_User_GetLoggedInUser;
 }
 unsigned long ovr_User_GetLoggedInUserFriends() {
@@ -1657,12 +1673,12 @@ intptr_t ovr_AchievementProgressArray_GetElement(intptr_t obj, uintptr_t index) 
     return 0;
 }
 intptr_t ovr_AchievementProgressArray_GetNextUrl(intptr_t obj) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
     return 0;
 }
 uintptr_t ovr_AchievementProgressArray_GetSize(intptr_t obj) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
     return 0;
 }
@@ -3243,7 +3259,7 @@ intptr_t ovr_Message_GetPingResult(intptr_t obj) {
     return 0;
 }
 intptr_t ovr_Message_GetPlatformInitialize(intptr_t obj) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
     return Platform_InitializeWithAccessToken;
 }
@@ -3361,7 +3377,7 @@ intptr_t ovr_Message_GetUserReportID(intptr_t obj) {
     return 0;
 }
 bool ovr_Message_IsError(intptr_t obj) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
     return 0;
 }
@@ -3641,7 +3657,7 @@ bool ovr_PingResult_IsTimeout(intptr_t obj) {
     return 0;
 }
 PlatformInitializeResult ovr_PlatformInitialize_GetResult(intptr_t obj) {
-    LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+    LogFunction(IMPLEMENTED, NORMAL, __func__);
     
     return 0;
 }
