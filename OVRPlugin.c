@@ -15,7 +15,6 @@
 #include "include/PxrPlatformLoader.h"
 
 #include "include/Globals.h"
-#include "src/PxrUnityPluginLoader.c"
 #include "src/PxrToOculusMapper.c"
 #include "src/Logger.c"
 
@@ -86,9 +85,9 @@ bool ovrp_RecenterPose() {
 //NON-LEGACY
 void UnityPluginLoad(void *unityInterfaces) {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
-    //Crashes the game...
-    /*
-    Pxr_UnityPluginLoad(unityInterfaces);*/
+
+    //This is done by the PICO plugin.
+    //Probably in the future, if this doesn't work out, I'll have to RE the PICO plugin.
 }
 Sizei ovrp_GetEyeTextureSize(Eye eyeId) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -356,20 +355,21 @@ uint32_t getButtonsFromState(PxrControllerInputState pxrState, PxrControllerHand
     uint32_t state = 0;
     switch (controllerType) {
         case PXR_CONTROLLER_RIGHT:
-            state |= pxrState.AXValue * RawButton_A;
-            state |= pxrState.BYValue * RawButton_B;
+            state |= pxrState.AXValue * Button_One;
+            state |= pxrState.BYValue * Button_Two;
+
             break;
         case PXR_CONTROLLER_LEFT:
-            state |= pxrState.AXValue * RawButton_X;
-            state |= pxrState.BYValue * RawButton_Y;
+            state |= pxrState.AXValue * Button_Three;
+            state |= pxrState.BYValue * Button_Four;
             break;
         default:
             break;
     }
 
     //The same for both controllers
-    state |= pxrState.homeValue * RawButton_Start;
-    state |= pxrState.backValue * RawButton_Back;
+    state |= pxrState.homeValue * Button_Start;
+    state |= pxrState.backValue * Button_Back;
 
     return state;
 }
@@ -378,22 +378,42 @@ uint32_t getTouchFromState(PxrControllerInputState pxrState, PxrControllerHandne
     uint32_t state = 0;
     switch (controllerType) {
         case PXR_CONTROLLER_RIGHT:
-            state |= pxrState.AXTouchValue * RawButton_A;
-            state |= pxrState.BYTouchValue * RawButton_B;
+            state |= pxrState.AXTouchValue * RawTouch_A;
+            state |= pxrState.BYTouchValue * RawTouch_B;
 
-            state |= pxrState.triggerTouchValue * RawButton_RIndexTrigger;
-            state |= pxrState.rockerTouchValue * RawButton_RHandTrigger;
+            state |= pxrState.triggerTouchValue * RawTouch_RIndexTrigger;
 
-            state |= pxrState.thumbrestTouchValue * RawButton_RThumbstick;
+            state |= pxrState.thumbrestTouchValue * RawTouch_RThumbRest;
             break;
         case PXR_CONTROLLER_LEFT:
-            state |= pxrState.AXTouchValue * RawButton_X;
-            state |= pxrState.BYTouchValue * RawButton_Y;
+            state |= pxrState.AXTouchValue * RawTouch_X;
+            state |= pxrState.BYTouchValue * RawTouch_Y;
 
-            state |= pxrState.triggerTouchValue * RawButton_LIndexTrigger;
-            state |= pxrState.rockerTouchValue * RawButton_LHandTrigger;
+            state |= pxrState.triggerTouchValue * RawTouch_LIndexTrigger;
 
-            state |= pxrState.thumbrestTouchValue * RawButton_LThumbstick;
+            state |= pxrState.thumbrestTouchValue * RawTouch_LThumbRest;
+            break;
+        default:
+            break;
+    }
+
+    return state;
+}
+
+uint32_t getNearTouchFromState(PxrControllerInputState pxrState, PxrControllerHandness controllerType) {
+    uint32_t state = 0;
+    switch (controllerType) {
+        case PXR_CONTROLLER_RIGHT:
+            state |= pxrState.triggerTouchValue * RawNearTouch_RIndexTrigger;
+
+            state |= pxrState.AXTouchValue * RawNearTouch_RThumbButtons;
+            state |= pxrState.BYTouchValue * RawNearTouch_RThumbButtons;
+            break;
+        case PXR_CONTROLLER_LEFT:
+            state |= pxrState.triggerTouchValue * RawNearTouch_LIndexTrigger;
+
+            state |= pxrState.AXTouchValue * RawNearTouch_LThumbButtons;
+            state |= pxrState.BYTouchValue * RawNearTouch_LThumbButtons;
             break;
         default:
             break;
@@ -411,6 +431,7 @@ ControllerState6 getControllerState(uint controllerMask) {
 
         state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_LEFT);
         state.Touches |= getTouchFromState(controllerState, PXR_CONTROLLER_LEFT);
+        state.NearTouches |= getNearTouchFromState(controllerState, PXR_CONTROLLER_LEFT);
 
         state.LIndexTrigger = controllerState.triggerValue;
         state.LHandTrigger = controllerState.gripValue;
@@ -424,6 +445,7 @@ ControllerState6 getControllerState(uint controllerMask) {
 
         state.Buttons |= getButtonsFromState(controllerState, PXR_CONTROLLER_RIGHT);
         state.Touches |= getTouchFromState(controllerState, PXR_CONTROLLER_RIGHT);
+        state.NearTouches |= getNearTouchFromState(controllerState, PXR_CONTROLLER_RIGHT);
 
         state.RIndexTrigger = controllerState.triggerValue;
         state.RHandTrigger = controllerState.gripValue;
