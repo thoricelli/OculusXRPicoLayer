@@ -14,7 +14,7 @@
 #include "include/PxrPlatformLoader.h"
 
 #include "include/Globals.h"
-#include "src/Logger.c"
+#include "src/Logger.cpp"
 
 // Initialization
 int queueIndex = 0;
@@ -44,7 +44,7 @@ ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, job
     //The Oculus SDK only provides us with the JNI.
     //Whilst the PICO SDK needs the JavaVM object instead.
     JavaVM* jvm;
-    (*jni)->GetJavaVM(jni, &jvm);
+    jni->GetJavaVM(&jvm);
 
     PxrInitParamData initParamData = {
             .activity = activityObject,
@@ -59,7 +59,7 @@ ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, job
     Pxr_SetGraphicOption(PXR_OPENGL_ES);
     Pxr_Initialize();
 
-    return 0;//*((ovrPlatformInitializeResult*)&result);
+    return ovrPlatformInitializeResult__Success;//*((ovrPlatformInitializeResult*)&result);
 }
 
 bool ovr_UnityInitWrapper(char *appId) {
@@ -245,7 +245,7 @@ void ovr_Voip_SetSystemVoipPassthrough(bool passthrough) {
     
     return;
 }
-void ovr_Voip_SetSystemVoipMicrophoneMuted(enum VoipMuteState muted) {
+void ovr_Voip_SetSystemVoipMicrophoneMuted(VoipMuteState muted) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
     return;
@@ -424,10 +424,10 @@ int ovr_Party_PluginGetSharedMemHandle() {
     
     return 0;
 }
-enum VoipMuteState ovr_Party_PluginGetVoipMicrophoneMuted() {
+VoipMuteState ovr_Party_PluginGetVoipMicrophonegMuted() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return Unknown;
 }
 bool ovr_Party_PluginGetVoipPassthrough() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -437,7 +437,7 @@ bool ovr_Party_PluginGetVoipPassthrough() {
 SystemVoipStatus ovr_Party_PluginGetVoipStatus() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrSystemVoipStatus_Unknown;
 }
 void ovr_Voip_Accept(uint64_t userID) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -447,12 +447,12 @@ void ovr_Voip_Accept(uint64_t userID) {
 VoipDtxState ovr_Voip_GetIsConnectionUsingDtx(uint64_t peerID) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrVoipDtxState_Unknown;
 }
 VoipBitrate ovr_Voip_GetLocalBitrate(uint64_t peerID) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrVoipBitrate_Unknown;
 }
 uintptr_t ovr_Voip_GetOutputBufferMaxSize() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -487,7 +487,7 @@ uintptr_t ovr_Voip_GetPCMWithTimestampFloat(uint64_t senderID, float *outputBuff
 VoipBitrate ovr_Voip_GetRemoteBitrate(uint64_t peerID) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrVoipBitrate_Unknown;
 }
 uint32_t ovr_Voip_GetSyncTimestamp(uint64_t userID) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -499,17 +499,17 @@ long ovr_Voip_GetSyncTimestampDifference(uint32_t lhs, uint32_t rhs) {
     
     return 0;
 }
-enum VoipMuteState ovr_Voip_GetSystemVoipMicrophoneMuted() {
+VoipMuteState ovr_Voip_GetSystemVoipMicrophoneMuted() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return Unknown;
 }
 SystemVoipStatus ovr_Voip_GetSystemVoipStatus() {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrSystemVoipStatus_Unknown;
 }
-void ovr_Voip_SetMicrophoneMuted(enum VoipMuteState state) {
+void ovr_Voip_SetMicrophoneMuted(VoipMuteState state) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
     return;
@@ -1644,7 +1644,7 @@ unsigned long ovr_AchievementDefinition_GetTarget(intptr_t obj) {
 AchievementType ovr_AchievementDefinition_GetType(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrAchievement_TypeUnknown;
 }
 intptr_t ovr_AchievementDefinitionArray_GetElement(intptr_t obj, uintptr_t index) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2034,7 +2034,7 @@ intptr_t ovr_Challenge_GetTitle(intptr_t obj) {
 ChallengeVisibility ovr_Challenge_GetVisibility(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrChallengeVisibility_Unknown;
 }
 intptr_t ovr_ChallengeArray_GetElement(intptr_t obj, uintptr_t index) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2214,7 +2214,7 @@ unsigned long ovr_CloudStorageMetadata_GetSaveTime(intptr_t obj) {
 CloudStorageDataStatus ovr_CloudStorageMetadata_GetStatus(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrCloudStorageDataStatus_Unknown;
 }
 intptr_t ovr_CloudStorageMetadata_GetVersionHandle(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2254,7 +2254,7 @@ intptr_t ovr_CloudStorageUpdateResponse_GetKey(intptr_t obj) {
 CloudStorageUpdateStatus ovr_CloudStorageUpdateResponse_GetStatus(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrCloudStorageUpdateStatus_Unknown;
 }
 intptr_t ovr_CloudStorageUpdateResponse_GetVersionHandle(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2469,7 +2469,7 @@ intptr_t ovr_LaunchDetails_GetLaunchSource(intptr_t obj) {
 LaunchType ovr_LaunchDetails_GetLaunchType(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrLaunchType_Unknown;
 }
 uint64_t ovr_LaunchDetails_GetRoomID(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2659,7 +2659,7 @@ intptr_t ovr_LinkedAccount_GetAccessToken(intptr_t obj) {
 ServiceProvider ovr_LinkedAccount_GetServiceProvider(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrServiceProvider_Unknown;
 }
 intptr_t ovr_LinkedAccount_GetUserId(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2684,7 +2684,7 @@ bool ovr_LivestreamingApplicationStatus_GetStreamingEnabled(intptr_t obj) {
 LivestreamingStartStatus ovr_LivestreamingStartResult_GetStreamingResult(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrLivestreamingStartStatus_Unknown;
 }
 bool ovr_LivestreamingStatus_GetCommentsVisible(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3458,7 +3458,7 @@ long ovr_NetSyncConnection_GetConnectionId(intptr_t obj) {
 NetSyncDisconnectReason ovr_NetSyncConnection_GetDisconnectReason(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrNetSyncDisconnectReason_Unknown;
 }
 uint64_t ovr_NetSyncConnection_GetSessionId(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3468,7 +3468,7 @@ uint64_t ovr_NetSyncConnection_GetSessionId(intptr_t obj) {
 NetSyncConnectionStatus ovr_NetSyncConnection_GetStatus(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrNetSyncConnectionStatus_Unknown;
 }
 intptr_t ovr_NetSyncConnection_GetZoneId(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3553,7 +3553,7 @@ uint64_t ovr_NetworkingPeer_GetID(intptr_t obj) {
 PeerConnectionState ovr_NetworkingPeer_GetState(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrPeerState_Unknown;
 }
 uint64_t ovr_OrgScopedID_GetID(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3573,7 +3573,7 @@ intptr_t ovr_Packet_GetBytes(intptr_t obj) {
 SendPolicy ovr_Packet_GetSendPolicy(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrSend_Unknown;
 }
 uint64_t ovr_Packet_GetSenderID(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3618,7 +3618,7 @@ uint64_t ovr_PartyID_GetID(intptr_t obj) {
 PartyUpdateAction ovr_PartyUpdateNotification_GetAction(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrPartyUpdateAction_Unknown;
 }
 uint64_t ovr_PartyUpdateNotification_GetPartyId(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3683,7 +3683,7 @@ bool ovr_PingResult_IsTimeout(intptr_t obj) {
 PlatformInitializeResult ovr_PlatformInitialize_GetResult(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrPlatformInitialize_Success;
 }
 uint ovr_Price_GetAmountInHundredths(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3833,12 +3833,12 @@ bool ovr_Room_GetIsMembershipLocked(intptr_t obj) {
 RoomJoinPolicy ovr_Room_GetJoinPolicy(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrRoom_JoinPolicyNone;
 }
 RoomJoinability ovr_Room_GetJoinability(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrRoom_JoinabilityUnknown;
 }
 intptr_t ovr_Room_GetMatchedUsers(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3868,7 +3868,7 @@ intptr_t ovr_Room_GetTeams(intptr_t obj) {
 RoomType ovr_Room_GetType(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrRoom_TypeUnknown;
 }
 intptr_t ovr_Room_GetUsers(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3943,7 +3943,7 @@ bool ovr_RoomInviteNotificationArray_HasNextPage(intptr_t obj) {
 SdkAccountType ovr_SdkAccount_GetAccountType(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrSdkAccountType_Unknown;
 }
 uint64_t ovr_SdkAccount_GetUserId(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3968,7 +3968,7 @@ intptr_t ovr_SendInvitesResult_GetInvites(intptr_t obj) {
 ShareMediaStatus ovr_ShareMediaResult_GetStatus(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrShareMediaStatus_Unknown;
 }
 uint64_t ovr_SupplementaryMetric_GetID(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -3980,15 +3980,15 @@ long ovr_SupplementaryMetric_GetMetric(intptr_t obj) {
     
     return 0;
 }
-enum VoipMuteState ovr_SystemVoipState_GetMicrophoneMuted(intptr_t obj) {
+VoipMuteState ovr_SystemVoipState_GetMicrophoneMuted(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return Unknown;
 }
 SystemVoipStatus ovr_SystemVoipState_GetStatus(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
     
-    return 0;
+    return ovrSystemVoipStatus_Unknown;
 }
 intptr_t ovr_Team_GetAssignedUsers(intptr_t obj) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -4085,7 +4085,7 @@ uintptr_t ovr_TestUserAppAccessArray_GetSize(intptr_t obj) {
     
     return 0;
 }
-char *ovr_User_GetDisplayName(intptr_t obj) {
+const char *ovr_User_GetDisplayName(intptr_t obj) {
     return "PicoLayer";
 }
 uint64_t ovr_User_GetID(intptr_t obj) {
@@ -4093,32 +4093,32 @@ uint64_t ovr_User_GetID(intptr_t obj) {
     
     return 0;
 }
-char *ovr_User_GetImageUrl(intptr_t obj) {
+const char *ovr_User_GetImageUrl(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
 }
-char *ovr_User_GetInviteToken(intptr_t obj) {
+const char *ovr_User_GetInviteToken(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
 }
-char *ovr_User_GetOculusID(intptr_t obj) {
+const char *ovr_User_GetOculusID(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
 }
-char* ovr_User_GetPresence(intptr_t obj) {
+const char* ovr_User_GetPresence(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
 }
-char* ovr_User_GetPresenceDeeplinkMessage(intptr_t obj) {
+const char* ovr_User_GetPresenceDeeplinkMessage(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
 }
-char *ovr_User_GetPresenceDestinationApiName(intptr_t obj) {
+const char *ovr_User_GetPresenceDestinationApiName(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";
@@ -4138,7 +4138,7 @@ UserPresenceStatus ovr_User_GetPresenceStatus(intptr_t obj) {
 
     return ovrUserPresenceStatus_Online;
 }
-char *ovr_User_GetSmallImageUrl(intptr_t obj) {
+const char *ovr_User_GetSmallImageUrl(intptr_t obj) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     return "";

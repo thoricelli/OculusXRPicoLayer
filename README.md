@@ -84,8 +84,3 @@ Why certain games don't work:
 - With some games, a proprietary method is used by Oculus, that requires me to RE the Oculus SDK in massive detail.
 - A custom implementation of the: Unity API and the Unreal API will have to be done. <br>
   Which includes RE'ing the OpenXR API that is used on PICO systems. <br> (On the plus side, most parts are open source)
-
-And... this project will need to get ported to C++.
-
-The future of this project? <br>
-I don't know.

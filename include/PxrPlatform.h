@@ -1,4 +1,7 @@
-﻿//For both libpxr_api & libPxrPlatform.
+﻿#ifndef PXR_PLATFORM_H
+#define PXR_PLATFORM_H
+
+//For both libpxr_api & libPxrPlatform.
 #include <stdint.h>
 #include "PxrTypes.h"
 
@@ -15,13 +18,23 @@ typedef struct PICO_UserDefinedSettings
     unsigned short enableStageMode;
 } PICO_UserDefinedSettings;
 
-extern bool Pxr_LoadPlugin();
-extern void Pxr_UnloadPlugin();
-extern void Pxr_SetUserDefinedSettings(PICO_UserDefinedSettings settings);
-extern bool Pxr_GetBoundaryConfigured();
-extern int Pxr_GetBoundaryDimensions(bool isPlayArea, PxrVector3f *dimension);
-extern bool Pxr_GetBoundaryVisible();
-extern int Pxr_SetBoundaryVisible(bool value);
-extern int Pxr_SetDisplayRefreshRate(float refreshRate);
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+bool Pxr_LoadPlugin();
+void Pxr_UnloadPlugin();
+void Pxr_SetUserDefinedSettings(PICO_UserDefinedSettings settings);
+bool Pxr_GetBoundaryConfigured();
+int Pxr_GetBoundaryDimensions(bool isPlayArea, PxrVector3f *dimension);
+bool Pxr_GetBoundaryVisible();
+int Pxr_SetBoundaryVisible(bool value);
+int Pxr_SetDisplayRefreshRate(float refreshRate);
 typedef Quaternion (*ConvertRotationWith2VectorDelegate)(Vector3 from, Vector3 to);
-extern void Pxr_Construct(ConvertRotationWith2VectorDelegate fromToRotation);
+void Pxr_Construct(ConvertRotationWith2VectorDelegate fromToRotation);
+
+#if defined(__cplusplus)
+} // extern "C"
+#endif
+
+#endif  // PXR_PLATFORM_H

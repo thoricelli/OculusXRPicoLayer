@@ -14,7 +14,7 @@ jobs:
           ./compile_linux.sh
         shell: bash
         env:
-          NDK_CLANG: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
+          NDK_CLANG: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
       - uses: actions/upload-artifact@v4
         with:
           name: build

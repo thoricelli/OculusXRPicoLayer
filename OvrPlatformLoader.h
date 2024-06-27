@@ -25,12 +25,12 @@ typedef struct ovrKeyValuePair_ {
     double doubleValue_;
 } ovrKeyValuePair;
 
-enum VoipMuteState
+typedef enum VoipMuteState_
 {
     Unknown,
     Muted,
     Unmuted
-};
+} VoipMuteState;
 
 typedef void(*FilterCallback)(int16_t pcmData[], size_t pcmDataLength, int frequency, int numChannels);
 

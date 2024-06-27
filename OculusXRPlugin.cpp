@@ -12,7 +12,7 @@
 #include "include/PxrPlugin.h"
 
 #include "include/Globals.h"
-#include "src/Logger.c"
+#include "src/Logger.cpp"
 
 ovrpVector4f s_ColorScale = {1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -109,7 +109,7 @@ int SetGPULevel(int gpuLevel) {
     return gpuLevel;
 }
 
-void GetOVRPVersion(char* version) {
+void GetOVRPVersion(const char* version) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     version = OVRP_VERSION;
@@ -149,7 +149,7 @@ bool GetBoundaryConfigured() {
 bool GetBoundaryDimensions(void* boundaryType, void* dimensions) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    return Pxr_GetBoundaryDimensions(true, dimensions);
+    return Pxr_GetBoundaryDimensions(true, ((PxrVector3f_*)&dimensions));
 }
 
 bool GetBoundaryVisible() {

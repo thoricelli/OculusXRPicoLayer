@@ -153,6 +153,9 @@ typedef enum
     PXR_LEFT_EYE_FOV,
     PXR_RIGHT_EYE_FOV,
     PXR_BOTH_EYE_FOV,
+    SUPPORT_QUICK_SEETROUGH,
+    SET_FILTER_TYPE,
+    SET_SUBMIT_LAYER_EXT_ITEM_COLOR_MATRIX,
 } PxrConfigType;
 
 typedef enum

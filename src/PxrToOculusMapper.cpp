@@ -80,7 +80,7 @@ void PxrHandCombinedStateToOVRHandState(
         posefDummy.Position.y = 1;
         posefDummy.Position.z = 0;
 
-        handStateInternal->Status = aimState.Status;
+        handStateInternal->Status = *((HandStatus *)&aimState.Status);
         handStateInternal->RootPose = posefDummy;
 
         handStateInternal->BoneRotations_0 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[0].pose);
@@ -108,7 +108,7 @@ void PxrHandCombinedStateToOVRHandState(
         handStateInternal->BoneRotations_22 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[22].pose);
         handStateInternal->BoneRotations_23 = PxrPosefToOVRQuatf(jointsLocations.jointLocations[23].pose);
 
-        handStateInternal->Pinches = 0;//aimState.Pinches;
+        handStateInternal->Pinches = HandFingerPinch_Thumb;//aimState.Pinches;
 
         handStateInternal->PinchStrength_0 = aimState.pinchStrengthIndex;
         handStateInternal->PinchStrength_1 = aimState.pinchStrengthMiddle;
