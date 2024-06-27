@@ -3,6 +3,7 @@ apk_testing
 ghidra
 build_apk.ps1
 /.idea/
+/.vscode/
 
 # Build results
 out
