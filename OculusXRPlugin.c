@@ -72,6 +72,7 @@ Quaternion ConvertRotationWith2Vector(Vector3 from, Vector3 to) {
 
 //God, theres different versions of UserDefinedSettings... :(
 void SetUserDefinedSettings(UserDefinedSettings *settings) {
+
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
     __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "Hello World! Made by thoricelli.");

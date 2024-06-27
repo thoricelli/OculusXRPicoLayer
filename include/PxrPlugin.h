@@ -59,6 +59,7 @@ int Pxr_EndFrame();
 bool Pxr_PollEvent(int eventCountMAX,int* eventDataCountOutput, PxrEventDataBuffer** eventDataPtr);
 
 // Log print
+extern unsigned int minLogLevel_PxrAPI;
 void Pxr_LogPrint(int priority, const char * tag, const char * fmt, ...);
 
 // Fov
@@ -175,6 +176,7 @@ void Pxr_UnregisterPsensor();
 
 int Pxr_GetStringMetaFromApplication(const char* keyname,char* value);
 int  Pxr_GetIntMetaFromApplication(const char* keyname,int * value);
+
 #if defined(__cplusplus)
 } // extern "C"
 #endif

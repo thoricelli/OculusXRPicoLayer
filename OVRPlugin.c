@@ -20,8 +20,19 @@
 
 /* LEGACY (TODO) */
 bool ovrp_PreInitialize() {
+    int success = 0;
+
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+
+    //This just fails. Great.
+    success += Pxr_SetConfigInt(PXR_PXRPLUGIN_LOG_LEVEL, 8);
+    success += Pxr_SetConfigInt(PXR_RUNTIME_LOG_LEVEL, 8);
+    success += Pxr_SetConfigInt(PXR_UNITY_LOG_LEVEL, 8);
+    success += Pxr_SetConfigInt(PXR_UNREAL_LOG_LEVEL, 8);
+    success += Pxr_SetConfigInt(PXR_NATIVE_LOG_LEVEL, 8);
+
+    if (success != 0) __android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "SetConfig failed!");
+
     return 1;
 }
 bool ovrp_Initialize(RenderAPIType apiType, intptr_t platformArgs) {
@@ -87,7 +98,9 @@ void UnityPluginLoad(void *unityInterfaces) {
     LogFunction(NON_IMPLEMENTED, FREQUENT, __func__);
 
     //This is done by the PICO plugin.
-    //Probably in the future, if this doesn't work out, I'll have to RE the PICO plugin.
+    //Probably in the future, if this doesn't work out, I'll have implement an own way of doing this.
+    //(This probably requires porting this to C++).
+    minLogLevel_PxrAPI = 8;
 }
 Sizei ovrp_GetEyeTextureSize(Eye eyeId) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2477,7 +2490,6 @@ Result ovrp_EraseSpaces(uint32_t spaceCount, uint64_t *spaces, uint32_t uuidCoun
 bool ovrp_Initialize5(RenderAPIType apiType, int *logCallBack, int* activity, int *OVRPInstance, int *OVRPPhysicalDevice, int *OVRPCommandQueue, int *initializeFlags) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    Pxr_SetGraphicOption(*(PxrGraphicOption *)&apiType);
     return Pxr_Initialize();
 }
 Result ovrp_GetNativeSDKPointer2() {

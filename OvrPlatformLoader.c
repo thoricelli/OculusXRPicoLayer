@@ -4,6 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include <android/log.h>
+#include <jni.h>
 
 #include "OvrPlatformLoader.h"
 
@@ -31,16 +32,39 @@ bool ovr_IsPlatformInitialized() {
 
     return 1;
 }
-ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, jobject activityObject, JNIEnv * jni) {
+ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char* appId, jobject* activityObject, JNIEnv *jni) {
     LogFunction(IMPLEMENTED, NORMAL, __func__);
 
-    ppfPlatformInitializeResult result = ppf_InitializeAndroid(0, activityObject, jni);
+    //We don't really need online functionality IG.
+    //ppfPlatformInitializeResult result = ppf_InitializeAndroid("308733", activityObject, jni);
+
+    //Log everything please.
+    minLogLevel_PxrAPI = 8;
+
+    //The Oculus SDK only provides us with the JNI.
+    //Whilst the PICO SDK needs the JavaVM object instead.
+    JavaVM* jvm;
+    (*jni)->GetJavaVM(jni, &jvm);
+
+    PxrInitParamData initParamData = {
+            .activity = activityObject,
+            .vm = jvm,
+            .controllerdof = 1,
+            .headdof = 1,
+    };
+
+    //Trying to even RE is giving me a headache
+    Pxr_SetInitializeData(&initParamData);
+    Pxr_SetPlatformOption(PXR_UNREAL);
+    Pxr_SetGraphicOption(PXR_OPENGL_ES);
+    Pxr_Initialize();
+
     return 0;//*((ovrPlatformInitializeResult*)&result);
 }
 
 bool ovr_UnityInitWrapper(char *appId) {
     LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
-    
+
     //ppf_UnityInitWrapper(appId);
     return 1;
 }
