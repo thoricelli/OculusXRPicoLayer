@@ -1174,10 +1174,14 @@ typedef struct SceneCaptureRequestInternal_
 
 typedef enum RenderAPIType_
 {
-    RenderAPI_None   = 0,       ///< No API
-    RenderAPI_OpenGL = 1,       ///< OpenGL
-    RenderAPI_D3D11  = 2,       ///< DirectX 11
-    RenderAPI_D3D12  = 3,        ///< DirectX 12
+    ovrRenderAPI_None,
+    ovrRenderAPI_OpenGL,
+    ovrRenderAPI_Android_GLES,  // May include extra native window pointers, etc.
+    ovrRenderAPI_D3D9,
+    ovrRenderAPI_D3D10,
+    ovrRenderAPI_D3D11,
+    ovrRenderAPI_Vulkan,
+    ovrRenderAPI_Count
 } RenderAPIType;
 
 typedef enum RenderModelFlags_

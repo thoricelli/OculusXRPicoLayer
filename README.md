@@ -48,6 +48,10 @@ You'll need the following files (both from my repo): <br>
 - libpxr_api.so
 - libpxrplatformloader.so
 
+(C++)
+
+- libc++\_shared.so
+
 Make sure you take the ones I committed to the repo, they have some patched strings/instructions to make them work.
 
 1. Build or download the required libs.

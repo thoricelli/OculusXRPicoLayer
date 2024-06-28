@@ -16,6 +16,10 @@
 #include "include/Globals.h"
 #include "src/Logger.cpp"
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 // Initialization
 int queueIndex = 0;
 intptr_t lastMessage[15]; // For the FreeMessage function.
@@ -41,27 +45,6 @@ ovrPlatformInitializeResult ovr_PlatformInitializeAndroid(const char *appId, job
 
     // We don't really need online functionality IG.
     // ppfPlatformInitializeResult result = ppf_InitializeAndroid("308733", activityObject, jni);
-
-    // Log everything please.
-    minLogLevel_PxrAPI = 8;
-
-    // The Oculus SDK only provides us with the JNI.
-    // Whilst the PICO SDK needs the JavaVM object instead.
-    JavaVM *jvm;
-    jni->GetJavaVM(&jvm);
-
-    PxrInitParamData initParamData = {
-        .activity = activityObject,
-        .vm = jvm,
-        .controllerdof = 1,
-        .headdof = 1,
-    };
-
-    // Trying to even RE is giving me a headache
-    Pxr_SetInitializeData(&initParamData);
-    Pxr_SetPlatformOption(PXR_UNREAL);
-    Pxr_SetGraphicOption(PXR_OPENGL_ES);
-    Pxr_Initialize();
 
     return ovrPlatformInitializeResult__Success; //*((ovrPlatformInitializeResult*)&result);
 }
@@ -5774,3 +5757,7 @@ void ovr_VoipOptions_SetCreateNewConnectionUseDtx(intptr_t handle, VoipDtxState 
 
     return;
 }
+
+#if defined(__cplusplus)
+} // extern "C"
+#endif
