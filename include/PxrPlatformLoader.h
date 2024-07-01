@@ -1,6 +1,7 @@
 ﻿#include <stdint.h>
 
-typedef enum {
+typedef enum
+{
     ppfPlatformInitializeResult_Unknown = -999,
     ppfPlatformInitializeResult_NetError = -6,
     ppfPlatformInitializeResult_MissingImpl = -5,
@@ -21,4 +22,4 @@ extern ppfRequest ppf_UnityInitAsynchronousWrapper(const char *appId);
 /// @param  appId The application ID get from developer dashboard.
 /// @return The initialize result.
 ///
-ppfPlatformInitializeResult ppf_InitializeAndroid(const char *appId, jobject applicationObject, JNIEnv *env);
+extern "C" ppfPlatformInitializeResult ppf_InitializeAndroid(const char *appId, jobject *applicationObject, JNIEnv *env);
