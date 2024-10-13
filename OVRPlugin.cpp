@@ -34,7 +34,7 @@ extern "C"
         // Load JNI environment
         VM->AttachCurrentThread(&env, NULL);
 
-        return 0;
+        return env->GetVersion();
     }
 
     /* LEGACY (TODO) */
@@ -421,13 +421,16 @@ extern "C"
     {
         uint32_t connectedControllers = 0;
 
+        int leftState = Pxr_GetControllerConnectStatus(PXR_CONTROLLER_LEFT);
+        int rightState = Pxr_GetControllerConnectStatus(PXR_CONTROLLER_RIGHT);
+
         switch (controller)
         {
         case PXR_CONTROLLER_LEFT:
-            connectedControllers |= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_LEFT) * LTouch;
+            connectedControllers |= leftState * LTouch;
             break;
         case PXR_CONTROLLER_RIGHT:
-            connectedControllers |= Pxr_GetControllerConnectStatus(PXR_CONTROLLER_RIGHT) * RTouch;
+            connectedControllers |= rightState * RTouch;
             break;
         default:
             break;
@@ -548,6 +551,17 @@ extern "C"
 
             state.ConnectedControllers |= getConnectedController(PXR_CONTROLLER_RIGHT);
         }
+
+        /*if ((controllerMask & LHand) == LHand)
+        {
+            state.ConnectedControllers |= LHand;
+        }
+
+        if ((controllerMask & RHand) == RHand)
+        {
+            state.ConnectedControllers |= RHand;
+        }*/
+
         return state;
     }
 
@@ -838,7 +852,7 @@ extern "C"
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
-        return 0;
+        return 1;
     }
     // Deprecated. This function will not be supported in OpenXR
     BoundaryTestResult ovrp_TestBoundaryNode(Node nodeId, BoundaryType boundaryType)
@@ -867,7 +881,12 @@ extern "C"
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
-        Vector3f vector3FDummy;
+        Vector3f vector3FDummy =
+            {
+                .x = 20,
+                .y = 20,
+                .z = 20,
+            };
         return vector3FDummy;
     }
     // Deprecated. This function will not be supported in OpenXR
@@ -1127,7 +1146,6 @@ extern "C"
                 .externalImages = externalImages,
         };
         return Pxr_CreateLayer(&layerParam);*/
-        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
         return Success;
     }
@@ -1660,9 +1678,7 @@ extern "C"
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
-        *handTrackingEnabled = false;
-        // return Pxr_GetHandTrackerSettingState(handTrackingEnabled);
-        return Success;
+        return (Result)Pxr_GetHandTrackerSettingState(handTrackingEnabled);
     }
     void GetPXRHandStateForOVR(int hand, HandStateInternal *handState)
     {
@@ -1674,21 +1690,31 @@ extern "C"
         PxrHandJointsLocations jointsLocations;
         Pxr_GetHandTrackerJointLocations(hand, &jointsLocations);
 
-        PoseStatef headsetPosef = getPosefStateForSensor();
-
         PxrHandCombinedStateToOVRHandState(aimState, jointsLocations, handState);
     }
     Result ovrp_GetHandState(Step stepId, Hand hand, HandStateInternal *handState)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__); // Not done yet
 
+        PxrHandState pxrState;
+
         GetPXRHandStateForOVR(hand, handState);
 
         return Success;
     }
+
+    void getSkeletonBase(SkeletonType skeletonType, Skeleton *skeleton)
+    {
+        skeleton->Type = SkeletonType_HandRight;
+        skeleton->NumBones = 24;
+        skeleton->NumBoneCapsules = 19;
+    }
+
     Result ovrp_GetSkeleton(SkeletonType skeletonType, Skeleton *skeleton)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        getSkeletonBase(skeletonType, skeleton);
 
         return Success;
     }
@@ -1876,6 +1902,8 @@ extern "C"
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
+        getSkeletonBase(skeletonType, ((Skeleton *)skeleton));
+
         return Success;
     }
     Result ovrp_PollEvent(EventDataBuffer *eventDataBuffer)
@@ -1888,6 +1916,8 @@ extern "C"
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
+        *xrApi = CAPI;
+
         return Success;
     }
     Result ovrp_GetNativeOpenXRHandles(uint64_t *xrInstance, uint64_t *xrSession)
@@ -1899,6 +1929,8 @@ extern "C"
     Result ovrp_PollEvent2(EventType *eventType, intptr_t *eventData)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        //__android_log_print(ANDROID_LOG_INFO, PLUGIN_NAME, "Poll event asked for: %d", *eventType);
 
         return Success;
     }
@@ -2855,6 +2887,8 @@ extern "C"
     Result ovrp_GetSkeleton3(SkeletonType skeletonType, Skeleton3Internal *skeleton)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        getSkeletonBase(skeletonType, ((Skeleton *)skeleton));
 
         return Success;
     }

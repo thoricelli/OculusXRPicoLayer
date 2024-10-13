@@ -4,6 +4,7 @@ ghidra
 build_apk.ps1
 /.idea/
 /.vscode/
+/.vs/
 
 # Build results
 out

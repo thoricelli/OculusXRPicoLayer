@@ -648,6 +648,18 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_Achievements_GetNextAchievementDefinitionArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Achievements_GetNextAchievementProgressArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_Achievements_GetProgressByName(char *names, int count)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -672,13 +684,67 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_Application_CancelAppDownload()
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Application_CheckAppDownloadProgress()
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_Application_GetVersion()
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
         return 0;
     }
+    unsigned long ovr_Application_InstallAppUpdateAndRelaunch(intptr_t deelpink_options)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_Application_LaunchOtherApp(uint64_t appID, intptr_t deeplink_options)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_AppDownloadProgressResult_GetDownloadBytes(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_AppDownloadProgressResult_GetDownloadedBytes(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_AppDownloadProgressResult_GetStatusCode(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_AppDownloadResult_GetTimestamp(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_DeviceApplicationIntegrity_GetIntegrityToken(const char *challenge_nonce)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Application_StartAppDownload()
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -1024,6 +1090,12 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_GroupPresence_GetNextApplicationInviteArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_GroupPresence_GetSentInvites()
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -1126,6 +1198,18 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_IAP_GetNextProductArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_IAP_GetNextPurchaseArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_IAP_GetProductsBySKU(char *skus, int count)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -1187,6 +1271,12 @@ extern "C"
         return 0;
     }
     unsigned long ovr_Leaderboard_GetNextEntries(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Leaderboard_GetNextLeaderboardArrayPage(intptr_t handle)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -1510,6 +1600,12 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_RichPresence_GetNextDestinationArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_RichPresence_Set(intptr_t richPresenceOptions)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -1703,6 +1799,12 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_User_GetNextBlockedUserArrayPage(intptr_t handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     unsigned long ovr_User_GetLoggedInUserFriendsAndRooms()
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -1722,6 +1824,12 @@ extern "C"
         return 0;
     }
     unsigned long ovr_User_GetNextUserArrayPage(ovrUserArrayHandle *handle)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_User_GetNextUserCapabilityArrayPage(intptr_t handle)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -2028,6 +2136,24 @@ extern "C"
         return 0;
     }
     uint64_t ovr_Application_GetID(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_ApplicationVersion_GetReleaseDate(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_ApplicationVersion_GetSize(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_ApplicationVersion_GetCurrentCode(intptr_t obj)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -2346,6 +2472,12 @@ extern "C"
         return 0;
     }
     uintptr_t ovr_CalApplicationSuggestionArray_GetSize(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Challenge_GetCreationType(intptr_t obj)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -2849,6 +2981,12 @@ extern "C"
 
         return 0;
     }
+    unsigned long ovr_InstalledApplication_GetVersionCode(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
     intptr_t ovr_InstalledApplication_GetVersionName(intptr_t obj)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
@@ -2916,6 +3054,18 @@ extern "C"
         return 0;
     }
     intptr_t ovr_LaunchDetails_GetLaunchSource(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_LaunchDetails_GetLobbySessionID(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_LaunchDetails_GetMatchSessionID(intptr_t obj)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
@@ -3526,6 +3676,18 @@ extern "C"
         return obj;
     }
     intptr_t ovr_Message_GetAchievementUpdate(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Message_GetAppDownloadProgressResult(intptr_t obj)
+    {
+        LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
+
+        return 0;
+    }
+    unsigned long ovr_Message_GetAppDownloadResult(intptr_t obj)
     {
         LogFunction(NON_IMPLEMENTED, NORMAL, __func__);
 
