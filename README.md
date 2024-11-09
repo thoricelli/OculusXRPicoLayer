@@ -1,3 +1,5 @@
+This repository is archived. I will not be updating it anymore.
+
 # OculusXRPicoLayer
 
 An attempt to port Quest games over to PICO. <br>
@@ -74,17 +76,3 @@ Make sure you take the ones I committed to the repo, they have some patched stri
 |       Waltz of the Wizard        |         Sound          |                 No video                 |
 |          Job Simulator           | Video <br> Controllers |   Audio glitches <br> Physics glitches   |
 |       I Expect You To Die        |           /            | Won't work without custom implementation |
-
-# Future
-
-Currently only a limited amount of Unity games actually functionally work.
-<br> Unreal games will not work without further reverse engineering efforts.
-
-Figuring out why certain games don't work is going to require A LOT of reverse engineering. <br>
-(Mostly just incompatible API calls with Oculus & PICO, different GUID's, etc, that can not simply just be solved by using a proxy)
-
-Why certain games don't work:
-
-- With some games, a proprietary method is used by Oculus, that requires me to RE the Oculus SDK in massive detail.
-- A custom implementation of the: Unity API and the Unreal API will have to be done. <br>
-  Which includes RE'ing the OpenXR API that is used on PICO systems. <br> (On the plus side, most parts are open source)
